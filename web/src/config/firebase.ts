@@ -2,12 +2,12 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDNPICw8gN474MvVt6Mea3Hor4sbkadbEc",
-  authDomain: "foodbridge-16a01.firebaseapp.com",
-  projectId: "foodbridge-16a01",
-  storageBucket: "foodbridge-16a01.firebasestorage.app",
-  messagingSenderId: "582569049253",
-  appId: "1:582569049253:web:7f9db9919ab8dbeb2b614c"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
