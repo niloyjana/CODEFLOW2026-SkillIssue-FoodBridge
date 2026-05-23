@@ -179,6 +179,17 @@ export const Login: React.FC = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  useEffect(() => {
+    const originalBodyStyle = document.body.style.overflow;
+    const originalHtmlStyle = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalBodyStyle;
+      document.documentElement.style.overflow = originalHtmlStyle;
+    };
+  }, []);
+
   // Blinking effects
   useEffect(() => {
     const scheduleBlink = () => {
