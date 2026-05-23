@@ -296,11 +296,15 @@ export const Login: React.FC = () => {
     {
       style: {
         height: '100vh',
-        width: '100vw',
+        width: '100%',
+        maxWidth: '100%',
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
         background: 'var(--bg-primary)',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        boxSizing: 'border-box',
+        margin: '0',
+        padding: '0'
       }
     },
 
@@ -317,7 +321,8 @@ export const Login: React.FC = () => {
           padding: '2rem 3rem',
           position: 'relative',
           overflow: 'hidden',
-          height: '100%'
+          height: '100%',
+          boxSizing: 'border-box'
         }
       },
       React.createElement(
@@ -566,7 +571,8 @@ export const Login: React.FC = () => {
           justifyContent: 'center',
           padding: '1.5rem',
           height: '100%',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          boxSizing: 'border-box'
         }
       },
       React.createElement(
@@ -577,7 +583,8 @@ export const Login: React.FC = () => {
             width: '100%',
             maxWidth: '380px',
             padding: '1.5rem',
-            borderRadius: 'var(--radius-lg)'
+            borderRadius: 'var(--radius-lg)',
+            boxSizing: 'border-box'
           }
         },
         React.createElement(
@@ -699,7 +706,8 @@ export const Login: React.FC = () => {
                   borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--border-color)',
                   fontSize: '0.85rem',
-                  background: 'var(--bg-primary)'
+                  background: 'var(--bg-primary)',
+                  boxSizing: 'border-box'
                 }
               }),
               React.createElement(
