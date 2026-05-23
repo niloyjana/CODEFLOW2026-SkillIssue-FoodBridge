@@ -330,7 +330,7 @@ export const Login: React.FC = () => {
           borderRight: '1px solid var(--border-light)',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '3rem',
+          padding: '3rem 3rem 0 3rem',
           position: 'relative',
           overflow: 'hidden',
           height: '100%',
@@ -357,7 +357,8 @@ export const Login: React.FC = () => {
             justifyContent: 'center',
             height: '420px',
             position: 'relative',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            marginTop: 'auto'
           }
         },
         React.createElement(
