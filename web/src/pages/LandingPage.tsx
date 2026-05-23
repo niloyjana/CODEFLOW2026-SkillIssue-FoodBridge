@@ -54,11 +54,9 @@ export const LandingPage: React.FC = () => {
   };
 
   React.useEffect(() => {
-    if (window.location.hash === '#about-us') {
-      const el = document.getElementById('about-us');
-      if (el) {
-        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 150);
-      }
+    const el = document.getElementById('about-us');
+    if (el) {
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 200);
     }
   }, []);
 

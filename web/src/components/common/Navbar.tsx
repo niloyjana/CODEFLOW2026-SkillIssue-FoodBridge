@@ -26,7 +26,16 @@ export const Navbar: React.FC = () => {
 
   return React.createElement(
     'nav',
-    { className: 'navbar nav-mask-reveal' },
+    {
+      className: 'navbar nav-mask-reveal',
+      style: {
+        background: 'rgba(255, 255, 255, 0.75)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(76, 175, 80, 0.1)',
+        padding: '0.8rem 2rem'
+      }
+    },
     React.createElement(
       NavLink,
       { to: '/', className: 'navbar-brand' },
@@ -37,84 +46,77 @@ export const Navbar: React.FC = () => {
     React.createElement(
       'div',
       { className: 'navbar-links' },
-      user && user.type === 'restaurant' && React.createElement(
-        NavLink,
-        {
-          to: '/restaurant',
-          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
-        },
-        'Dashboard'
-      ),
-      user && user.type === 'individual' && React.createElement(
-        NavLink,
-        {
-          to: '/individual',
-          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
-        },
-        'Dashboard'
-      ),
-      React.createElement(
-        NavLink,
-        {
-          to: '/leaderboard',
-          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
-        },
-        'Leaderboard'
-      ),
-      React.createElement(
-        'a',
-        {
-          href: '/#about-us',
-          onClick: handleAboutClick,
-          className: 'nav-link',
-          style: { cursor: 'pointer' }
-        },
-        'About Us'
-      ),
       user ? React.createElement(
-        'div',
-        { className: 'nav-user-info' },
-        React.createElement(
-          'span',
-          { className: 'user-badge' },
-          user.type
-        ),
-        React.createElement(
-          'span',
-          { className: 'user-points' },
-          `${user.points} pts`
-        ),
-        React.createElement(
-          'button',
-          { 
-            onClick: handleLogout, 
-            className: 'btn btn-secondary', 
-            style: { padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' } 
-          },
-          React.createElement(Icons.LogOut, { size: 14 }),
-          'Logout'
-        )
-      ) : React.createElement(
         React.Fragment,
         null,
-        React.createElement(
+        user.type === 'restaurant' && React.createElement(
           NavLink,
           {
-            to: '/login',
+            to: '/restaurant',
             className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
           },
-          'Login'
+          'Dashboard'
+        ),
+        user.type === 'individual' && React.createElement(
+          NavLink,
+          {
+            to: '/individual',
+            className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
+          },
+          'Dashboard'
         ),
         React.createElement(
           NavLink,
           {
-            to: '/register',
+            to: '/leaderboard',
             className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
           },
-          'Register'
+          'Leaderboard'
+        ),
+        React.createElement(
+          'a',
+          {
+            href: '/#about-us',
+            onClick: handleAboutClick,
+            className: 'nav-link',
+            style: { cursor: 'pointer' }
+          },
+          'About Us'
+        ),
+        React.createElement(
+          'div',
+          { className: 'nav-user-info' },
+          React.createElement(
+            'span',
+            { className: 'user-badge' },
+            user.type
+          ),
+          React.createElement(
+            'span',
+            { className: 'user-points' },
+            `${user.points} pts`
+          ),
+          React.createElement(
+            'button',
+            {
+              onClick: handleLogout,
+              className: 'btn btn-secondary',
+              style: { padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }
+            },
+            React.createElement(Icons.LogOut, { size: 14 }),
+            'Logout'
+          )
         )
+      ) : React.createElement(
+        NavLink,
+        {
+          to: '/login',
+          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
+        },
+        'Login'
       )
     )
   );
 };
+
 export default Navbar;
