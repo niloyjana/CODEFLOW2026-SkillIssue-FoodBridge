@@ -357,7 +357,7 @@ export const Login: React.FC = () => {
             justifyContent: 'center',
             height: '420px',
             position: 'absolute',
-            bottom: '0',
+            bottom: '20px',
             left: '0',
             right: '0',
             boxSizing: 'border-box'
