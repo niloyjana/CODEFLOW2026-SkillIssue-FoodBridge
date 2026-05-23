@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import Icons from './Icons';
 
 export const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -11,14 +12,27 @@ export const Navbar: React.FC = () => {
     navigate('/login');
   };
 
+  const handleAboutClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (window.location.pathname === '/') {
+      const el = document.getElementById('about-us');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate('/#about-us');
+    }
+  };
+
   return React.createElement(
     'nav',
-    { className: 'navbar' },
+    { className: 'navbar nav-mask-reveal' },
     React.createElement(
       NavLink,
       { to: '/', className: 'navbar-brand' },
-      'FoodShare',
-      React.createElement('span', null, 'Hackathon')
+      React.createElement(Icons.Logo, { size: 28, style: { marginRight: '0.4rem', filter: 'drop-shadow(0 2px 4px rgba(46,125,50,0.25))' } }),
+      'Food',
+      React.createElement('span', null, 'Bridge')
     ),
     React.createElement(
       'div',
@@ -29,7 +43,7 @@ export const Navbar: React.FC = () => {
           to: '/restaurant',
           className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
         },
-        'Restaurant'
+        'Dashboard'
       ),
       user && user.type === 'individual' && React.createElement(
         NavLink,
@@ -37,7 +51,7 @@ export const Navbar: React.FC = () => {
           to: '/individual',
           className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
         },
-        'Individual'
+        'Dashboard'
       ),
       React.createElement(
         NavLink,
@@ -46,6 +60,16 @@ export const Navbar: React.FC = () => {
           className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
         },
         'Leaderboard'
+      ),
+      React.createElement(
+        'a',
+        {
+          href: '/#about-us',
+          onClick: handleAboutClick,
+          className: 'nav-link',
+          style: { cursor: 'pointer' }
+        },
+        'About Us'
       ),
       user ? React.createElement(
         'div',
@@ -62,7 +86,12 @@ export const Navbar: React.FC = () => {
         ),
         React.createElement(
           'button',
-          { onClick: handleLogout, className: 'btn btn-secondary', style: { padding: '0.4rem 0.8rem', fontSize: '0.8rem' } },
+          { 
+            onClick: handleLogout, 
+            className: 'btn btn-secondary', 
+            style: { padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' } 
+          },
+          React.createElement(Icons.LogOut, { size: 14 }),
           'Logout'
         )
       ) : React.createElement(

@@ -3,6 +3,7 @@ import { usePosts } from '../../hooks/usePosts';
 import { useAuth } from '../../hooks/useAuth';
 import { formatDate, formatPortions } from 'shared/utils/format';
 import Card from '../common/Card';
+import Icons from '../common/Icons';
 
 export const IndividualDashboard: React.FC = () => {
   const { posts } = usePosts();
@@ -16,22 +17,34 @@ export const IndividualDashboard: React.FC = () => {
     null,
     React.createElement(
       Card,
-      { title: 'Volunteer Profile' },
+      { 
+        title: 'Volunteer Profile',
+        className: 'glass-panel hover-lift'
+      },
       React.createElement(
         'div',
         { className: 'flex justify-between align-center mt-2' },
         React.createElement(
           'div',
           null,
-          React.createElement('h4', { style: { fontSize: '1.4rem', color: 'var(--primary-color)' } }, user?.name),
-          React.createElement('p', { style: { color: 'var(--text-secondary)', fontSize: '0.9rem' } }, user?.email),
-          user?.phone && React.createElement('p', { style: { color: 'var(--text-secondary)', fontSize: '0.85rem' } }, `Phone: ${user.phone}`),
-          user?.address && React.createElement('p', { style: { color: 'var(--text-secondary)', fontSize: '0.85rem' } }, `Address: ${user.address}`)
+          React.createElement('h4', { style: { fontSize: '1.4rem', color: 'var(--primary-color)', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' } }, 
+            React.createElement(Icons.User, { size: 20 }),
+            user?.name
+          ),
+          React.createElement('p', { style: { color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.2rem' } }, user?.email),
+          user?.phone && React.createElement('p', { style: { color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.2rem' } }, `Phone: ${user.phone}`),
+          user?.address && React.createElement('p', { style: { color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.2rem' } }, 
+            React.createElement(Icons.MapPin, { size: 14, color: 'var(--primary-color)' }),
+            `Address: ${user.address}`
+          )
         ),
         React.createElement(
           'div',
           { className: 'text-center' },
-          React.createElement('p', { style: { color: 'var(--text-secondary)', fontSize: '0.85rem' } }, 'Impact Points'),
+          React.createElement('p', { style: { color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.2rem', justifyContent: 'center' } }, 
+            React.createElement(Icons.Award, { size: 14, color: 'var(--secondary-color)' }),
+            'Impact Points'
+          ),
           React.createElement('h4', { style: { fontSize: '1.8rem', color: 'var(--secondary-color)', fontWeight: 'bold' } }, `${user?.points || 0} pts`)
         )
       ),
@@ -64,11 +77,14 @@ export const IndividualDashboard: React.FC = () => {
           claimedPosts.map((post) =>
             React.createElement(
               'div',
-              { key: post.id, className: 'card post-card claimed' },
+              { key: post.id, className: 'card post-card glass-panel hover-lift claimed' },
               React.createElement(
                 'div',
                 { className: 'flex justify-between align-center' },
-                React.createElement('h4', null, post.restaurantName),
+                React.createElement('h4', { style: { display: 'inline-flex', alignItems: 'center', gap: '0.4rem' } }, 
+                  React.createElement(Icons.Utensils, { size: 16, color: 'var(--primary-color)' }),
+                  post.restaurantName
+                ),
                 React.createElement(
                   'span',
                   { className: 'badge badge-claimed' },
@@ -86,20 +102,29 @@ export const IndividualDashboard: React.FC = () => {
                 post.address && React.createElement(
                   'div',
                   { className: 'meta-item', style: { gridColumn: 'span 2' } },
-                  React.createElement('span', { className: 'meta-label' }, 'Pickup Address'),
+                  React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
+                    React.createElement(Icons.MapPin, { size: 12 }),
+                    'Pickup Address'
+                  ),
                   React.createElement('span', { className: 'meta-value' }, post.address)
                 ),
                 React.createElement(
                   'div',
                   { className: 'meta-item' },
-                  React.createElement('span', { className: 'meta-label' }, 'Pickup Deadline'),
+                  React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
+                    React.createElement(Icons.Calendar, { size: 12 }),
+                    'Pickup Deadline'
+                  ),
                   React.createElement('span', { className: 'meta-value' }, formatDate(post.pickupBy))
                 ),
                 React.createElement(
                   'div',
                   { className: 'meta-item' },
-                  React.createElement('span', { className: 'meta-label' }, 'Waste Saved'),
-                  React.createElement('span', { className: 'meta-value' }, formatWaste(post.predictedWasteKg))
+                  React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
+                    React.createElement(Icons.Leaf, { size: 12, color: 'var(--primary-color)' }),
+                    'Waste Saved'
+                  ),
+                  React.createElement('span', { className: 'meta-value', style: { color: 'var(--primary-color)', fontWeight: '600' } }, formatWaste(post.predictedWasteKg))
                 )
               )
             )

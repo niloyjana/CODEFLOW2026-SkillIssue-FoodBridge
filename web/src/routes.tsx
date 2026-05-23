@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import RestaurantPage from './pages/RestaurantPage';
 import IndividualPage from './pages/IndividualPage';
 import LeaderboardPage from './pages/LeaderboardPage';
+import LandingPage from './pages/LandingPage';
 
 // Guard for authenticated users
 const ProtectedRoute: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
@@ -44,19 +45,7 @@ const RoleRoute: React.FC<{ children?: React.ReactNode; allowedRole: 'restaurant
   return React.createElement(React.Fragment, null, children);
 };
 
-// Root redirect router
-const RootRedirect: React.FC = () => {
-  const { user } = useAuth();
 
-  if (!user) {
-    return React.createElement(Navigate, { to: '/login', replace: true });
-  }
-
-  return React.createElement(Navigate, {
-    to: user.type === 'restaurant' ? '/restaurant' : '/individual',
-    replace: true,
-  });
-};
 
 export const AppRoutes: React.FC = () => {
   return React.createElement(
@@ -82,11 +71,7 @@ export const AppRoutes: React.FC = () => {
       Route,
       {
         path: '/',
-        element: React.createElement(
-          ProtectedRoute,
-          null,
-          React.createElement(RootRedirect, null)
-        )
+        element: React.createElement(Layout, null, React.createElement(LandingPage, null))
       }
     ),
     React.createElement(

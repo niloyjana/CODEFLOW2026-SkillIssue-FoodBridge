@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { UserType } from 'shared/types';
 import Button from '../components/common/Button';
+import Icons from '../components/common/Icons';
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
@@ -17,11 +18,7 @@ export const Login: React.FC = () => {
     setLoading(true);
     try {
       await login(email, role);
-      if (role === 'restaurant') {
-        navigate('/restaurant');
-      } else {
-        navigate('/individual');
-      }
+      navigate('/#about-us');
     } catch (err) {
       console.error(err);
       alert('Login failed');
@@ -35,11 +32,7 @@ export const Login: React.FC = () => {
     setLoading(true);
     try {
       await login(emailAddr, selectedRole);
-      if (selectedRole === 'restaurant') {
-        navigate('/restaurant');
-      } else {
-        navigate('/individual');
-      }
+      navigate('/#about-us');
     } catch (err) {
       console.error(err);
       alert('Quick login failed');
@@ -53,12 +46,13 @@ export const Login: React.FC = () => {
     { className: 'auth-wrapper' },
     React.createElement(
       'div',
-      { className: 'auth-card' },
+      { className: 'auth-card glass-panel hover-lift' },
       React.createElement(
         'div',
         { className: 'auth-header' },
-        React.createElement('h1', { style: { fontFamily: 'var(--font-heading)' } }, 'FoodShare'),
-        React.createElement('h2', null, 'Welcome Back')
+        React.createElement(Icons.Logo, { size: 48, style: { marginBottom: '0.8rem', filter: 'drop-shadow(0 4px 6px rgba(46,125,50,0.15))' } }),
+        React.createElement('h1', { style: { fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '0.2rem' } }, 'FoodBridge'),
+        React.createElement('h2', { style: { fontSize: '0.9rem', color: 'var(--text-secondary)' } }, 'Welcome Back')
       ),
       React.createElement(
         'form',
@@ -71,8 +65,10 @@ export const Login: React.FC = () => {
             {
               type: 'button',
               className: `role-tab ${role === 'restaurant' ? 'active' : ''}`,
+              style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' },
               onClick: () => setRole('restaurant')
             },
+            React.createElement(Icons.Utensils, { size: 14 }),
             'Restaurant'
           ),
           React.createElement(
@@ -80,8 +76,10 @@ export const Login: React.FC = () => {
             {
               type: 'button',
               className: `role-tab ${role === 'individual' ? 'active' : ''}`,
+              style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' },
               onClick: () => setRole('individual')
             },
+            React.createElement(Icons.Heart, { size: 14 }),
             'Individual'
           )
         ),
@@ -92,8 +90,8 @@ export const Login: React.FC = () => {
           React.createElement('input', {
             id: 'email',
             type: 'email',
-            className: 'form-control',
-            placeholder: role === 'restaurant' ? 'restaurant@foodshare.com' : 'individual@foodshare.com',
+            className: 'form-control glow-focus',
+            placeholder: role === 'restaurant' ? 'restaurant@foodbridge.com' : 'individual@foodbridge.com',
             value: email,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
             required: true,
@@ -103,9 +101,10 @@ export const Login: React.FC = () => {
           Button,
           {
             type: 'submit',
-            variant: 'primary',
+            className: 'btn-premium',
             fullWidth: true,
             disabled: loading,
+            style: { padding: '0.75rem 1rem', fontSize: '0.95rem', fontWeight: 600 }
           },
           loading ? 'Logging In...' : 'Log In'
         )
@@ -123,9 +122,10 @@ export const Login: React.FC = () => {
               type: 'button',
               variant: 'secondary',
               className: 'role-tab',
-              style: { flex: 1, padding: '0.4rem', fontSize: '0.75rem' },
-              onClick: () => handleQuickLogin('restaurant', 'restaurant@foodshare.com')
+              style: { flex: 1, padding: '0.4rem', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' },
+              onClick: () => handleQuickLogin('restaurant', 'restaurant@foodbridge.com')
             },
+            React.createElement(Icons.Utensils, { size: 11 }),
             'As Restaurant'
           ),
           React.createElement(
@@ -134,9 +134,10 @@ export const Login: React.FC = () => {
               type: 'button',
               variant: 'secondary',
               className: 'role-tab',
-              style: { flex: 1, padding: '0.4rem', fontSize: '0.75rem' },
-              onClick: () => handleQuickLogin('individual', 'individual@foodshare.com')
+              style: { flex: 1, padding: '0.4rem', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' },
+              onClick: () => handleQuickLogin('individual', 'individual@foodbridge.com')
             },
+            React.createElement(Icons.Heart, { size: 11 }),
             'As Individual'
           )
         )

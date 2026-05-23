@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { UserType } from 'shared/types';
 import Button from '../components/common/Button';
+import Icons from '../components/common/Icons';
 
 export const Register: React.FC = () => {
   const { register } = useAuth();
@@ -36,12 +37,13 @@ export const Register: React.FC = () => {
     { className: 'auth-wrapper' },
     React.createElement(
       'div',
-      { className: 'auth-card' },
+      { className: 'auth-card glass-panel hover-lift' },
       React.createElement(
         'div',
         { className: 'auth-header' },
-        React.createElement('h1', { style: { fontFamily: 'var(--font-heading)' } }, 'FoodShare'),
-        React.createElement('h2', null, 'Create Account')
+        React.createElement(Icons.Logo, { size: 48, style: { marginBottom: '0.8rem', filter: 'drop-shadow(0 4px 6px rgba(46,125,50,0.15))' } }),
+        React.createElement('h1', { style: { fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '0.2rem' } }, 'FoodBridge'),
+        React.createElement('h2', { style: { fontSize: '0.9rem', color: 'var(--text-secondary)' } }, 'Create Account')
       ),
       React.createElement(
         'form',
@@ -54,8 +56,10 @@ export const Register: React.FC = () => {
             {
               type: 'button',
               className: `role-tab ${role === 'restaurant' ? 'active' : ''}`,
+              style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' },
               onClick: () => setRole('restaurant')
             },
+            React.createElement(Icons.Utensils, { size: 14 }),
             'Restaurant'
           ),
           React.createElement(
@@ -63,8 +67,10 @@ export const Register: React.FC = () => {
             {
               type: 'button',
               className: `role-tab ${role === 'individual' ? 'active' : ''}`,
+              style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' },
               onClick: () => setRole('individual')
             },
+            React.createElement(Icons.Heart, { size: 14 }),
             'Individual'
           )
         ),
@@ -75,7 +81,7 @@ export const Register: React.FC = () => {
           React.createElement('input', {
             id: 'name',
             type: 'text',
-            className: 'form-control',
+            className: 'form-control glow-focus',
             placeholder: role === 'restaurant' ? 'e.g. Pizza Palace' : 'e.g. Alex Volunteer',
             value: name,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value),
@@ -89,23 +95,24 @@ export const Register: React.FC = () => {
           React.createElement('input', {
             id: 'email',
             type: 'email',
-            className: 'form-control',
+            className: 'form-control glow-focus',
             placeholder: 'info@organization.com',
             value: email,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
             required: true,
           })
         ),
-        React.createElement(
-          Button,
-          {
-            type: 'submit',
-            variant: 'primary',
-            fullWidth: true,
-            disabled: loading,
-          },
-          loading ? 'Creating Account...' : 'Register'
-        )
+          React.createElement(
+            Button,
+            {
+              type: 'submit',
+              className: 'btn-premium',
+              fullWidth: true,
+              disabled: loading,
+              style: { padding: '0.75rem 1rem', fontSize: '0.95rem', fontWeight: 600 }
+            },
+            loading ? 'Creating Account...' : 'Register'
+          )
       ),
       React.createElement(
         'div',

@@ -4,7 +4,7 @@ import Leaderboard from '../components/leaderboard/Leaderboard';
 export const LeaderboardPage: React.FC = () => {
   return React.createElement(
     'div',
-    null,
+    { className: 'mask-reveal' },
     React.createElement(Leaderboard, null)
   );
 };
