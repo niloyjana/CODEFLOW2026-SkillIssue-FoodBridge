@@ -276,20 +276,7 @@ export const Login: React.FC = () => {
     }
   };
 
-  const handleQuickLogin = async (selectedRole: UserType, emailAddr: string) => {
-    setRole(selectedRole);
-    setEmail(emailAddr);
-    setLoading(true);
-    try {
-      await login(emailAddr, selectedRole);
-      navigate('/#about-us');
-    } catch (err) {
-      console.error(err);
-      alert('Quick login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   return React.createElement(
     'div',
@@ -772,38 +759,7 @@ export const Login: React.FC = () => {
           )
         ),
 
-        // QUICK DEMO LOGINS BLOCK
-        React.createElement(
-          'div',
-          { style: { borderTop: '1px solid var(--border-light)', marginTop: '1rem', paddingTop: '0.8rem' } },
-          React.createElement('p', { style: { fontSize: '0.75rem', color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '0.4rem', fontWeight: '600' } }, 'Quick Demo Accounts'),
-          React.createElement(
-            'div',
-            { style: { display: 'flex', gap: '0.4rem' } },
-            React.createElement(
-              Button,
-              {
-                type: 'button',
-                variant: 'secondary',
-                style: { flex: '1', fontSize: '0.7rem', height: '28px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.2rem', padding: '0' },
-                onClick: () => handleQuickLogin('restaurant', 'restaurant@foodbridge.com')
-              },
-              React.createElement(Icons.Utensils, { size: 10 }),
-              'As Restaurant'
-            ),
-            React.createElement(
-              Button,
-              {
-                type: 'button',
-                variant: 'secondary',
-                style: { flex: '1', fontSize: '0.7rem', height: '28px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.2rem', padding: '0' },
-                onClick: () => handleQuickLogin('individual', 'individual@foodbridge.com')
-              },
-              React.createElement(Icons.Heart, { size: 10 }),
-              'As Individual'
-            )
-          )
-        ),
+
 
         // REGISTER DIRECT LINK
         React.createElement(
