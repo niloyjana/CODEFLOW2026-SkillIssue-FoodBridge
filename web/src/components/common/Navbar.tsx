@@ -31,13 +31,13 @@ export const Navbar: React.FC = () => {
         },
         'Restaurant'
       ),
-      user && user.type === 'shelter' && React.createElement(
+      user && user.type === 'individual' && React.createElement(
         NavLink,
         {
-          to: '/shelter',
+          to: '/individual',
           className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
         },
-        'Shelter'
+        'Individual'
       ),
       React.createElement(
         NavLink,

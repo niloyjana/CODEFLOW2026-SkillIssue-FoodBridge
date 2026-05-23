@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePosts } from '../../hooks/usePosts';
-import { formatDate, formatPortions, formatWaste, capitalize } from 'shared/utils/format';
+import { formatDate, formatPortions } from 'shared/utils/format';
 import Card from '../common/Card';
 import Button from '../common/Button';
 
@@ -16,16 +16,16 @@ export const AvailablePosts: React.FC = () => {
   return React.createElement(
     'div',
     null,
-    React.createElement('h2', { className: 'mb-2' }, 'Available Donations'),
+    React.createElement('h2', { className: 'mb-2' }, 'Available Food Donations'),
     availablePosts.length === 0
       ? React.createElement(
           Card,
           null,
-          React.createElement('p', { className: 'text-center', style: { color: 'var(--text-secondary)' } }, 'No active food posts available right now. Check back soon!')
+          React.createElement('p', { className: 'text-center', style: { color: 'var(--text-secondary)' } }, 'No active food posts available right now. Check back later!')
         )
       : React.createElement(
           'div',
-          { className: 'posts-list posts-list-grid', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' } },
+          { className: 'posts-list' },
           availablePosts.map((post) =>
             React.createElement(
               'div',
@@ -33,7 +33,7 @@ export const AvailablePosts: React.FC = () => {
               React.createElement(
                 'div',
                 { className: 'flex justify-between align-center' },
-                React.createElement('h3', { style: { fontSize: '1.2rem', color: 'var(--primary-color)' } }, post.restaurantName),
+                React.createElement('h3', { style: { fontSize: '1.25rem', color: 'var(--primary-color)' } }, post.restaurantName),
                 React.createElement(
                   'span',
                   { className: 'badge badge-active' },
@@ -48,36 +48,24 @@ export const AvailablePosts: React.FC = () => {
               React.createElement(
                 'div',
                 { className: 'post-meta-grid' },
-                React.createElement(
+                post.address && React.createElement(
                   'div',
-                  { className: 'meta-item' },
-                  React.createElement('span', { className: 'meta-label' }, 'Meal Time'),
-                  React.createElement('span', { className: 'meta-value' }, capitalize(post.mealTime))
-                ),
-                React.createElement(
-                  'div',
-                  { className: 'meta-item' },
-                  React.createElement('span', { className: 'meta-label' }, 'Venue'),
-                  React.createElement('span', { className: 'meta-value' }, capitalize(post.venueType))
-                ),
-                React.createElement(
-                  'div',
-                  { className: 'meta-item' },
-                  React.createElement('span', { className: 'meta-label' }, 'Seating Capacity'),
-                  React.createElement('span', { className: 'meta-value' }, post.seatingCapacity)
+                  { className: 'meta-item', style: { gridColumn: 'span 2' } },
+                  React.createElement('span', { className: 'meta-label' }, 'Location Address'),
+                  React.createElement('span', { className: 'meta-value' }, post.address)
                 ),
                 React.createElement(
                   'div',
                   { className: 'meta-item' },
                   React.createElement('span', { className: 'meta-label' }, 'Pickup By'),
                   React.createElement('span', { className: 'meta-value' }, formatDate(post.pickupBy))
+                ),
+                React.createElement(
+                  'div',
+                  { className: 'meta-item' },
+                  React.createElement('span', { className: 'meta-label' }, 'Est. Waste Saved'),
+                  React.createElement('span', { className: 'meta-value' }, `${post.predictedWasteKg} kg`)
                 )
-              ),
-              React.createElement(
-                'div',
-                { className: 'waste-alert' },
-                React.createElement('span', { className: 'waste-label' }, 'Est. Waste Saved:'),
-                React.createElement('span', { className: 'waste-value' }, formatWaste(post.predictedWasteKg))
               ),
               React.createElement(
                 Button,
@@ -87,7 +75,7 @@ export const AvailablePosts: React.FC = () => {
                   onClick: () => claimPost(post.id),
                   disabled: loading,
                 },
-                'Claim Pickup'
+                'Claim for Pickup'
               )
             )
           )

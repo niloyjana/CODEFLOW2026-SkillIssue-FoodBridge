@@ -6,14 +6,26 @@ export const MOCK_RESTAURANT_USER: User = {
   name: 'Pizza Palace',
   type: 'restaurant',
   points: 95,
+  phone: '555-0199',
+  address: '123 Pizza Way, Foodtown',
+  lat: 40.7128,
+  lng: -74.0060,
+  notificationsEnabled: true,
+  createdAt: new Date(Date.now() - 30 * 24 * 3600000).toISOString(),
 };
 
-export const MOCK_SHELTER_USER: User = {
-  id: 'shelter_1',
-  email: 'shelter@foodshare.com',
-  name: 'Safe Haven Shelter',
-  type: 'shelter',
+export const MOCK_INDIVIDUAL_USER: User = {
+  id: 'individual_1',
+  email: 'individual@foodshare.com',
+  name: 'Alex Volunteer',
+  type: 'individual',
   points: 150,
+  phone: '555-0144',
+  address: '456 Helping Hand Ave, Townsville',
+  lat: 40.7250,
+  lng: -74.0100,
+  notificationsEnabled: true,
+  createdAt: new Date(Date.now() - 15 * 24 * 3600000).toISOString(),
 };
 
 export const MOCK_POSTS: FoodPost[] = [
@@ -23,12 +35,12 @@ export const MOCK_POSTS: FoodPost[] = [
     restaurantName: 'Pizza Palace',
     portions: 25,
     predictedWasteKg: 5.4,
-    mealTime: 'lunch',
-    venueType: 'restaurant',
-    seatingCapacity: 60,
     status: 'active',
     createdAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
     pickupBy: new Date(Date.now() + 7200000).toISOString(), // in 2 hours
+    address: '123 Pizza Way, Foodtown',
+    lat: 40.7128,
+    lng: -74.0060,
   },
   {
     id: 'post_2',
@@ -36,12 +48,12 @@ export const MOCK_POSTS: FoodPost[] = [
     restaurantName: 'Green Cafe',
     portions: 12,
     predictedWasteKg: 2.1,
-    mealTime: 'breakfast',
-    venueType: 'cafe',
-    seatingCapacity: 20,
     status: 'active',
     createdAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
     pickupBy: new Date(Date.now() + 3600000).toISOString(), // in 1 hour
+    address: '88 Coffee Road, Townsville',
+    lat: 40.7150,
+    lng: -74.0020,
   },
   {
     id: 'post_3',
@@ -49,87 +61,98 @@ export const MOCK_POSTS: FoodPost[] = [
     restaurantName: 'Burger Junction',
     portions: 40,
     predictedWasteKg: 8.5,
-    mealTime: 'dinner',
-    venueType: 'fastfood',
-    seatingCapacity: 80,
     status: 'claimed',
     createdAt: new Date(Date.now() - 10800000).toISOString(), // 3 hours ago
     pickupBy: new Date(Date.now() + 1800000).toISOString(), // in 30 mins
-    claimedBy: 'shelter_1',
+    claimedBy: 'individual_1',
+    claimedByName: 'Alex Volunteer',
+    address: '77 Fast Food Lane, Metroville',
+    lat: 40.7300,
+    lng: -73.9950,
   },
 ];
 
 export const MOCK_LEADERBOARD: LeaderboardEntry[] = [
-  // Restaurants
+  // Restaurants (with totalKgSaved)
   {
     id: 'rest_2',
     name: 'Green Cafe',
     points: 180,
-    type: 'restaurant',
+    userType: 'restaurant',
     completedPickups: 18,
+    totalKgSaved: 36.5,
   },
   {
     id: 'rest_1',
     name: 'Pizza Palace',
     points: 95,
-    type: 'restaurant',
+    userType: 'restaurant',
     completedPickups: 9,
+    totalKgSaved: 18.2,
   },
   {
     id: 'rest_3',
     name: 'Burger Junction',
     points: 70,
-    type: 'restaurant',
+    userType: 'restaurant',
     completedPickups: 7,
+    totalKgSaved: 15.0,
   },
   {
     id: 'rest_4',
     name: 'Sweet Delights Bakery',
     points: 50,
-    type: 'restaurant',
+    userType: 'restaurant',
     completedPickups: 5,
+    totalKgSaved: 8.5,
   },
   {
     id: 'rest_5',
     name: 'Bistro Central',
     points: 30,
-    type: 'restaurant',
+    userType: 'restaurant',
     completedPickups: 3,
+    totalKgSaved: 5.2,
   },
-  // Shelters
+  // Individuals (with badges)
   {
-    id: 'shelter_1',
-    name: 'Safe Haven Shelter',
+    id: 'individual_1',
+    name: 'Alex Volunteer',
     points: 150,
-    type: 'shelter',
+    userType: 'individual',
     completedPickups: 15,
+    badges: ['Surplus Savior', 'Early Bird'],
   },
   {
-    id: 'shelter_2',
-    name: 'Grace Community Kitchen',
+    id: 'individual_2',
+    name: 'Sam Helper',
     points: 120,
-    type: 'shelter',
+    userType: 'individual',
     completedPickups: 12,
+    badges: ['Community Hero'],
   },
   {
-    id: 'shelter_3',
-    name: 'Hope Food Pantry',
+    id: 'individual_3',
+    name: 'Taylor Care',
     points: 85,
-    type: 'shelter',
+    userType: 'individual',
     completedPickups: 8,
+    badges: ['Consistent Packer'],
   },
   {
-    id: 'shelter_4',
-    name: 'Unity Mission House',
+    id: 'individual_4',
+    name: 'Morgan Friendly',
     points: 60,
-    type: 'shelter',
+    userType: 'individual',
     completedPickups: 6,
+    badges: ['Eco Warrior'],
   },
   {
-    id: 'shelter_5',
-    name: 'Mercy Outreach Center',
+    id: 'individual_5',
+    name: 'Jordan Kind',
     points: 40,
-    type: 'shelter',
+    userType: 'individual',
     completedPickups: 4,
+    badges: ['First Step'],
   },
 ];

@@ -21,7 +21,7 @@ export const Register: React.FC = () => {
       if (role === 'restaurant') {
         navigate('/restaurant');
       } else {
-        navigate('/shelter');
+        navigate('/individual');
       }
     } catch (err) {
       console.error(err);
@@ -62,21 +62,21 @@ export const Register: React.FC = () => {
             'button',
             {
               type: 'button',
-              className: `role-tab ${role === 'shelter' ? 'active' : ''}`,
-              onClick: () => setRole('shelter')
+              className: `role-tab ${role === 'individual' ? 'active' : ''}`,
+              onClick: () => setRole('individual')
             },
-            'Shelter'
+            'Individual'
           )
         ),
         React.createElement(
           'div',
           { className: 'form-group' },
-          React.createElement('label', { className: 'form-label', htmlFor: 'name' }, 'Organization Name'),
+          React.createElement('label', { className: 'form-label', htmlFor: 'name' }, 'Organization or Volunteer Name'),
           React.createElement('input', {
             id: 'name',
             type: 'text',
             className: 'form-control',
-            placeholder: role === 'restaurant' ? 'e.g. Pizza Palace' : 'e.g. Safe Haven Shelter',
+            placeholder: role === 'restaurant' ? 'e.g. Pizza Palace' : 'e.g. Alex Volunteer',
             value: name,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value),
             required: true,

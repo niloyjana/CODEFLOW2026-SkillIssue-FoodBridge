@@ -20,7 +20,7 @@ export const Login: React.FC = () => {
       if (role === 'restaurant') {
         navigate('/restaurant');
       } else {
-        navigate('/shelter');
+        navigate('/individual');
       }
     } catch (err) {
       console.error(err);
@@ -38,7 +38,7 @@ export const Login: React.FC = () => {
       if (selectedRole === 'restaurant') {
         navigate('/restaurant');
       } else {
-        navigate('/shelter');
+        navigate('/individual');
       }
     } catch (err) {
       console.error(err);
@@ -79,10 +79,10 @@ export const Login: React.FC = () => {
             'button',
             {
               type: 'button',
-              className: `role-tab ${role === 'shelter' ? 'active' : ''}`,
-              onClick: () => setRole('shelter')
+              className: `role-tab ${role === 'individual' ? 'active' : ''}`,
+              onClick: () => setRole('individual')
             },
-            'Shelter'
+            'Individual'
           )
         ),
         React.createElement(
@@ -93,7 +93,7 @@ export const Login: React.FC = () => {
             id: 'email',
             type: 'email',
             className: 'form-control',
-            placeholder: role === 'restaurant' ? 'restaurant@foodshare.com' : 'shelter@foodshare.com',
+            placeholder: role === 'restaurant' ? 'restaurant@foodshare.com' : 'individual@foodshare.com',
             value: email,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
             required: true,
@@ -135,9 +135,9 @@ export const Login: React.FC = () => {
               variant: 'secondary',
               className: 'role-tab',
               style: { flex: 1, padding: '0.4rem', fontSize: '0.75rem' },
-              onClick: () => handleQuickLogin('shelter', 'shelter@foodshare.com')
+              onClick: () => handleQuickLogin('individual', 'individual@foodshare.com')
             },
-            'As Shelter'
+            'As Individual'
           )
         )
       ),

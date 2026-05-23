@@ -25,11 +25,11 @@ export const useLeaderboard = () => {
   }, [fetchLeaderboard]);
 
   const restaurantLeaderboard = entries
-    .filter((entry) => entry.type === 'restaurant')
+    .filter((entry) => entry.userType === 'restaurant')
     .sort((a, b) => b.points - a.points);
 
   const shelterLeaderboard = entries
-    .filter((entry) => entry.type === 'shelter')
+    .filter((entry) => entry.userType === 'individual')
     .sort((a, b) => b.points - a.points);
 
   return {

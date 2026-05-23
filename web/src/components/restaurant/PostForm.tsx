@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { MealTime, VenueType } from 'shared/types';
 import { usePosts } from '../../hooks/usePosts';
 import Button from '../common/Button';
 import Card from '../common/Card';
+
+type MealTime = 'breakfast' | 'lunch' | 'dinner';
+type VenueType = 'cafe' | 'restaurant' | 'fastfood';
 
 export const PostForm: React.FC = () => {
   const { createPost, loading } = usePosts();

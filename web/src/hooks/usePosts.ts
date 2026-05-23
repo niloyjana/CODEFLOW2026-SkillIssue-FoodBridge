@@ -24,8 +24,8 @@ export const usePosts = () => {
 
   const createPost = async (postData: {
     portions: number;
-    mealTime: FoodPost['mealTime'];
-    venueType: FoodPost['venueType'];
+    mealTime: 'breakfast' | 'lunch' | 'dinner';
+    venueType: 'cafe' | 'restaurant' | 'fastfood';
     seatingCapacity: number;
   }) => {
     if (!user) {
@@ -41,7 +41,7 @@ export const usePosts = () => {
       });
       setPosts((prev) => [newPost, ...prev]);
       refreshSession();
-      alert(`Posted: Portions: ${newPost.portions}, Meal Time: ${newPost.mealTime}, Venue: ${newPost.venueType}, Seating: ${newPost.seatingCapacity}\nAI Waste Prediction: ${newPost.predictedWasteKg} kg`);
+      alert(`Posted: Portions: ${newPost.portions}, Meal Time: ${postData.mealTime}, Venue: ${postData.venueType}, Seating: ${postData.seatingCapacity}\nAI Waste Prediction: ${newPost.predictedWasteKg} kg`);
     } catch (e: any) {
       setError(e.message || 'Failed to create post');
       alert(`Error creating post: ${e.message}`);

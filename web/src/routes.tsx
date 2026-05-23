@@ -5,7 +5,7 @@ import Layout from './components/common/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import RestaurantPage from './pages/RestaurantPage';
-import ShelterPage from './pages/ShelterPage';
+import IndividualPage from './pages/IndividualPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 
 // Guard for authenticated users
@@ -24,7 +24,7 @@ const ProtectedRoute: React.FC<{ children?: React.ReactNode }> = ({ children }) 
 };
 
 // Guard for role specific routes
-const RoleRoute: React.FC<{ children?: React.ReactNode; allowedRole: 'restaurant' | 'shelter' }> = ({
+const RoleRoute: React.FC<{ children?: React.ReactNode; allowedRole: 'restaurant' | 'individual' }> = ({
   children,
   allowedRole,
 }) => {
@@ -36,7 +36,7 @@ const RoleRoute: React.FC<{ children?: React.ReactNode; allowedRole: 'restaurant
 
   if (user.type !== allowedRole) {
     return React.createElement(Navigate, {
-      to: user.type === 'restaurant' ? '/restaurant' : '/shelter',
+      to: user.type === 'restaurant' ? '/restaurant' : '/individual',
       replace: true,
     });
   }
@@ -53,7 +53,7 @@ const RootRedirect: React.FC = () => {
   }
 
   return React.createElement(Navigate, {
-    to: user.type === 'restaurant' ? '/restaurant' : '/shelter',
+    to: user.type === 'restaurant' ? '/restaurant' : '/individual',
     replace: true,
   });
 };
@@ -62,7 +62,6 @@ export const AppRoutes: React.FC = () => {
   return React.createElement(
     Routes,
     null,
-    // Public routes (Auth) outside Layout or inside? Let's render everything inside Layout for styling consistency
     React.createElement(
       Route,
       {
@@ -108,14 +107,14 @@ export const AppRoutes: React.FC = () => {
     React.createElement(
       Route,
       {
-        path: '/shelter',
+        path: '/individual',
         element: React.createElement(
           ProtectedRoute,
           null,
           React.createElement(
             RoleRoute,
-            { allowedRole: 'shelter' },
-            React.createElement(Layout, null, React.createElement(ShelterPage, null))
+            { allowedRole: 'individual' },
+            React.createElement(Layout, null, React.createElement(IndividualPage, null))
           )
         )
       }

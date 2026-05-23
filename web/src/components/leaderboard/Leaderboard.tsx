@@ -3,10 +3,10 @@ import { useLeaderboard } from '../../hooks/useLeaderboard';
 import Card from '../common/Card';
 
 export const Leaderboard: React.FC = () => {
-  const { restaurantLeaderboard, shelterLeaderboard, loading } = useLeaderboard();
-  const [activeTab, setActiveTab] = useState<'restaurants' | 'shelters'>('restaurants');
+  const { restaurantLeaderboard, shelterLeaderboard: individualLeaderboard, loading } = useLeaderboard();
+  const [activeTab, setActiveTab] = useState<'restaurants' | 'individuals'>('restaurants');
 
-  const currentLeaderboard = activeTab === 'restaurants' ? restaurantLeaderboard : shelterLeaderboard;
+  const currentLeaderboard = activeTab === 'restaurants' ? restaurantLeaderboard : individualLeaderboard;
 
   const getRankClass = (index: number) => {
     if (index === 0) return 'rank-1';
@@ -41,10 +41,10 @@ export const Leaderboard: React.FC = () => {
         React.createElement(
           'button',
           {
-            className: `tab-btn ${activeTab === 'shelters' ? 'active' : ''}`,
-            onClick: () => setActiveTab('shelters')
+            className: `tab-btn ${activeTab === 'individuals' ? 'active' : ''}`,
+            onClick: () => setActiveTab('individuals')
           },
-          'Shelters Leaderboard'
+          'Individuals Leaderboard'
         )
       ),
       loading
@@ -60,7 +60,10 @@ export const Leaderboard: React.FC = () => {
                 null,
                 React.createElement('th', { style: { width: '80px' } }, 'Rank'),
                 React.createElement('th', null, 'Name'),
-                React.createElement('th', { style: { textAlign: 'right' } }, activeTab === 'restaurants' ? 'Posts' : 'Claims'),
+                React.createElement('th', { style: { textAlign: 'right' } }, 'Pickups'),
+                activeTab === 'restaurants'
+                  ? React.createElement('th', { style: { textAlign: 'right' } }, 'Kg Saved')
+                  : React.createElement('th', { style: { textAlign: 'left', paddingLeft: '2rem' } }, 'Badges'),
                 React.createElement('th', { style: { textAlign: 'right', width: '120px' } }, 'Score')
               )
             ),
@@ -90,6 +93,32 @@ export const Leaderboard: React.FC = () => {
                     { style: { textAlign: 'right' } },
                     entry.completedPickups || 0
                   ),
+                  activeTab === 'restaurants'
+                    ? React.createElement(
+                        'td',
+                        { style: { textAlign: 'right', color: 'var(--text-secondary)' } },
+                        entry.totalKgSaved !== undefined ? `${entry.totalKgSaved.toFixed(1)} kg` : '0.0 kg'
+                      )
+                    : React.createElement(
+                        'td',
+                        { style: { textAlign: 'left', paddingLeft: '2rem' } },
+                        React.createElement(
+                          'div',
+                          { style: { display: 'flex', gap: '0.25rem', flexWrap: 'wrap' } },
+                          entry.badges && entry.badges.map((badge, bIdx) =>
+                            React.createElement(
+                              'span',
+                              { key: bIdx, className: 'badge badge-active', style: { fontSize: '0.7rem', padding: '0.15rem 0.4rem' } },
+                              badge
+                            )
+                          ),
+                          (!entry.badges || entry.badges.length === 0) && React.createElement(
+                            'span',
+                            { style: { fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic' } },
+                            'No badges yet'
+                          )
+                        )
+                      ),
                   React.createElement(
                     'td',
                     { style: { textAlign: 'right', fontWeight: 'bold', color: 'var(--primary-color)' } },

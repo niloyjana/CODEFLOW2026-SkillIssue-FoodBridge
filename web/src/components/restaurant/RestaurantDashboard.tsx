@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePosts } from '../../hooks/usePosts';
 import { useAuth } from '../../hooks/useAuth';
-import { formatDate, formatPortions, formatWaste, capitalize } from 'shared/utils/format';
+import { formatDate, formatPortions, formatWaste } from 'shared/utils/format';
 import Card from '../common/Card';
 
 export const RestaurantDashboard: React.FC = () => {
@@ -48,18 +48,6 @@ export const RestaurantDashboard: React.FC = () => {
                 React.createElement(
                   'div',
                   { className: 'meta-item' },
-                  React.createElement('span', { className: 'meta-label' }, 'Meal Time'),
-                  React.createElement('span', { className: 'meta-value' }, capitalize(post.mealTime))
-                ),
-                React.createElement(
-                  'div',
-                  { className: 'meta-item' },
-                  React.createElement('span', { className: 'meta-label' }, 'Venue Type'),
-                  React.createElement('span', { className: 'meta-value' }, capitalize(post.venueType))
-                ),
-                React.createElement(
-                  'div',
-                  { className: 'meta-item' },
                   React.createElement('span', { className: 'meta-label' }, 'Posted At'),
                   React.createElement('span', { className: 'meta-value' }, formatDate(post.createdAt))
                 ),
@@ -79,7 +67,7 @@ export const RestaurantDashboard: React.FC = () => {
               post.status === 'claimed' && React.createElement(
                 'p',
                 { style: { fontSize: '0.85rem', color: 'var(--secondary-color)', fontWeight: '600' } },
-                'claimed by a local shelter and scheduled for pickup.'
+                'claimed by a volunteer and scheduled for pickup.'
               )
             )
           )
