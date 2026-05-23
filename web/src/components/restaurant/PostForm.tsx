@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { usePosts } from '../../hooks/usePosts';
 import Button from '../common/Button';
 import Card from '../common/Card';
+import Icons from '../common/Icons';
 
 type MealTime = 'breakfast' | 'lunch' | 'dinner';
 type VenueType = 'cafe' | 'restaurant' | 'fastfood';
@@ -29,7 +30,10 @@ export const PostForm: React.FC = () => {
 
   return React.createElement(
     Card,
-    { title: 'Predict & Post Surplus Food' },
+    { 
+      title: 'Predict & Post Surplus Food',
+      className: 'glass-panel hover-lift' 
+    },
     React.createElement(
       'form',
       { onSubmit: handleSubmit, className: 'mt-2' },
@@ -40,7 +44,7 @@ export const PostForm: React.FC = () => {
         React.createElement('input', {
           id: 'portions',
           type: 'number',
-          className: 'form-control',
+          className: 'form-control glow-focus',
           value: portions,
           onChange: (e: React.ChangeEvent<HTMLInputElement>) => setPortions(parseInt(e.target.value) || 0),
           min: 1,
@@ -55,7 +59,7 @@ export const PostForm: React.FC = () => {
           'select',
           {
             id: 'mealTime',
-            className: 'form-control',
+            className: 'form-control glow-focus',
             value: mealTime,
             onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setMealTime(e.target.value as MealTime),
           },
@@ -72,7 +76,7 @@ export const PostForm: React.FC = () => {
           'select',
           {
             id: 'venueType',
-            className: 'form-control',
+            className: 'form-control glow-focus',
             value: venueType,
             onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setVenueType(e.target.value as VenueType),
           },
@@ -88,7 +92,7 @@ export const PostForm: React.FC = () => {
         React.createElement('input', {
           id: 'seatingCapacity',
           type: 'number',
-          className: 'form-control',
+          className: 'form-control glow-focus',
           value: seatingCapacity,
           onChange: (e: React.ChangeEvent<HTMLInputElement>) => setSeatingCapacity(parseInt(e.target.value) || 0),
           min: 1,
@@ -99,10 +103,12 @@ export const PostForm: React.FC = () => {
         Button,
         {
           type: 'submit',
-          variant: 'primary',
+          className: 'btn-premium',
           fullWidth: true,
           disabled: loading,
+          style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.65rem 1rem' }
         },
+        React.createElement(Icons.Plus, { size: 18 }),
         loading ? 'Analyzing Waste & Posting...' : 'Post surplus with AI prediction'
       )
     )

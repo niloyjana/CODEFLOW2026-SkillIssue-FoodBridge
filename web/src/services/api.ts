@@ -7,10 +7,10 @@ import { MOCK_POSTS, MOCK_LEADERBOARD, MOCK_RESTAURANT_USER, MOCK_INDIVIDUAL_USE
 export const MOCK_MODE = true;
 
 const STORAGE_KEYS = {
-  POSTS: 'foodshare_posts',
-  LEADERBOARD: 'foodshare_leaderboard',
-  SESSION: 'foodshare_session',
-  CLAIMS: 'foodshare_claims',
+  POSTS: 'foodbridge_posts',
+  LEADERBOARD: 'foodbridge_leaderboard',
+  SESSION: 'foodbridge_session',
+  CLAIMS: 'foodbridge_claims',
 };
 
 // Initialize localStorage if not set

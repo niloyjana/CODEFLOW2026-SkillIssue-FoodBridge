@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLeaderboard } from '../../hooks/useLeaderboard';
 import Card from '../common/Card';
+import Icons from '../common/Icons';
 
 export const Leaderboard: React.FC = () => {
   const { restaurantLeaderboard, shelterLeaderboard: individualLeaderboard, loading } = useLeaderboard();
@@ -26,7 +27,7 @@ export const Leaderboard: React.FC = () => {
     ),
     React.createElement(
       Card,
-      null,
+      { className: 'glass-panel hover-lift' },
       React.createElement(
         'div',
         { className: 'tabs-container' },
@@ -34,16 +35,20 @@ export const Leaderboard: React.FC = () => {
           'button',
           {
             className: `tab-btn ${activeTab === 'restaurants' ? 'active' : ''}`,
+            style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' },
             onClick: () => setActiveTab('restaurants')
           },
+          React.createElement(Icons.Utensils, { size: 14 }),
           'Restaurants Leaderboard'
         ),
         React.createElement(
           'button',
           {
             className: `tab-btn ${activeTab === 'individuals' ? 'active' : ''}`,
+            style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' },
             onClick: () => setActiveTab('individuals')
           },
+          React.createElement(Icons.Heart, { size: 14 }),
           'Individuals Leaderboard'
         )
       ),
@@ -85,7 +90,10 @@ export const Leaderboard: React.FC = () => {
                   ),
                   React.createElement(
                     'td',
-                    { style: { fontWeight: '600' } },
+                    { style: { fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.4rem', height: '40px' } },
+                    index === 0 && React.createElement(Icons.Trophy, { size: 16, color: '#ffd700' }),
+                    index === 1 && React.createElement(Icons.Trophy, { size: 16, color: '#c0c0c0' }),
+                    index === 2 && React.createElement(Icons.Trophy, { size: 16, color: '#cd7f32' }),
                     entry.name
                   ),
                   React.createElement(

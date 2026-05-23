@@ -2,7 +2,7 @@ import { FoodPost, LeaderboardEntry, User } from 'shared/types';
 
 export const MOCK_RESTAURANT_USER: User = {
   id: 'rest_1',
-  email: 'restaurant@foodshare.com',
+  email: 'restaurant@foodbridge.com',
   name: 'Pizza Palace',
   type: 'restaurant',
   points: 95,
@@ -16,7 +16,7 @@ export const MOCK_RESTAURANT_USER: User = {
 
 export const MOCK_INDIVIDUAL_USER: User = {
   id: 'individual_1',
-  email: 'individual@foodshare.com',
+  email: 'individual@foodbridge.com',
   name: 'Alex Volunteer',
   type: 'individual',
   points: 150,
