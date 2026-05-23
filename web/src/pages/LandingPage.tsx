@@ -3,8 +3,55 @@ import { useNavigate } from 'react-router-dom';
 import Icons from '../components/common/Icons';
 import Button from '../components/common/Button';
 
+const caseStudiesData = [
+  {
+    id: "case-bakery",
+    title: "Green Crust: Diverting 95% Bakery Waste",
+    description: "Discover how Green Crust Bakery automated surplus posting to rescue over 1,200kg of organic bread packages with local volunteers.",
+    href: "#",
+    image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=600&auto=format&fit=crop",
+  },
+  {
+    id: "case-shelter",
+    title: "Hope Center: Fast Hot Meal Rescues",
+    description: "Learn how active coordinate maps helped local volunteers deliver 450 hot dinner portions to shelters in under 30 minutes.",
+    href: "#",
+    image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=600&auto=format&fit=crop",
+  },
+  {
+    id: "case-market",
+    title: "Organic Fresh: 2.5 Ton Produce Rescue",
+    description: "See how community members partnered to rescue 2.5 tons of fresh seasonal produce, preventing regional landfill emissions.",
+    href: "#",
+    image: "https://images.unsplash.com/photo-1488459718432-01055e67e18a?q=80&w=600&auto=format&fit=crop",
+  },
+  {
+    id: "case-campus",
+    title: "Student Food Link: Dining Surplus Grid",
+    description: "Read about the university initiative that synchronized dining hall leftovers with local community pantries.",
+    href: "#",
+    image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop",
+  },
+  {
+    id: "case-bistro",
+    title: "Bistro Eco-Grid: Dining Waste Avoidance",
+    description: "Explore how a popular metropolitan dining venue integrated real-time posts to cut leftover waste by 80%.",
+    href: "#",
+    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=600&auto=format&fit=crop",
+  }
+];
+
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+
+  const scrollPrev = () => {
+    setCurrentSlide(prev => Math.max(prev - 1, 0));
+  };
+
+  const scrollNext = () => {
+    setCurrentSlide(prev => Math.min(prev + 1, caseStudiesData.length - 1));
+  };
 
   React.useEffect(() => {
     if (window.location.hash === '#about-us') {
@@ -293,6 +340,236 @@ export const LandingPage: React.FC = () => {
               React.createElement('h4', { style: { fontSize: '1.05rem', fontWeight: '700', marginBottom: '0.3rem', color: 'var(--text-primary)' } }, 'Mutual Community Impact Earned'),
               React.createElement('p', { style: { fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.4' } }, 'Successful claims accumulate points, elevating volunteers and restaurants up our gamified leaderboard.')
             )
+          )
+        )
+      ),
+
+      // DIVIDER LINE
+      React.createElement('div', {
+        style: {
+          width: '100%',
+          height: '1px',
+          background: 'rgba(76, 175, 80, 0.15)',
+          margin: '3.5rem 0 3rem 0'
+        }
+      }),
+
+      // CAROUSEL SECTION CONTAINER
+      React.createElement(
+        'div',
+        { className: 'carousel-section', style: { width: '100%', overflow: 'hidden' } },
+        
+        // CAROUSEL HEADER
+        React.createElement(
+          'div',
+          {
+            style: {
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-end',
+              marginBottom: '2rem',
+              gap: '1.5rem',
+              flexWrap: 'wrap'
+            }
+          },
+          React.createElement(
+            'div',
+            { style: { display: 'flex', flexDirection: 'column', gap: '0.4rem' } },
+            React.createElement('h3', { style: { fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-primary)' } }, 'Impact Case Studies'),
+            React.createElement('p', { style: { color: 'var(--text-secondary)', maxWidth: '600px', fontSize: '0.9rem', lineHeight: '1.5' } }, 'Discover how leading local venues and volunteer organizations are leveraging FoodBridge to combat daily waste and build direct neighborhood support.')
+          ),
+          
+          // CONTROL BUTTONS
+          React.createElement(
+            'div',
+            { style: { display: 'flex', gap: '0.6rem' } },
+            React.createElement(
+              'button',
+              {
+                className: 'btn btn-secondary',
+                onClick: scrollPrev,
+                disabled: currentSlide === 0,
+                style: {
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0',
+                  cursor: currentSlide === 0 ? 'not-allowed' : 'pointer',
+                  opacity: currentSlide === 0 ? '0.4' : '1',
+                  background: 'var(--glass-bg)',
+                  border: '1px solid var(--border-color)',
+                  transition: 'all 0.2s ease'
+                }
+              },
+              React.createElement('svg', { width: '18', height: '18', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' },
+                React.createElement('line', { x1: '19', y1: '12', x2: '5', y2: '12' }),
+                React.createElement('polyline', { points: '12 19 5 12 12 5' })
+              )
+            ),
+            React.createElement(
+              'button',
+              {
+                className: 'btn btn-secondary',
+                onClick: scrollNext,
+                disabled: currentSlide === caseStudiesData.length - 1,
+                style: {
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0',
+                  cursor: currentSlide === caseStudiesData.length - 1 ? 'not-allowed' : 'pointer',
+                  opacity: currentSlide === caseStudiesData.length - 1 ? '0.4' : '1',
+                  background: 'var(--glass-bg)',
+                  border: '1px solid var(--border-color)',
+                  transition: 'all 0.2s ease'
+                }
+              },
+              React.createElement('svg', { width: '18', height: '18', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' },
+                React.createElement('line', { x1: '5', y1: '12', x2: '19', y2: '12' }),
+                React.createElement('polyline', { points: '12 5 19 12 12 19' })
+              )
+            )
+          )
+        ),
+
+        // CAROUSEL VIEWPORT
+        React.createElement(
+          'div',
+          { style: { width: '100%', overflow: 'hidden', padding: '0.5rem 0' } },
+          React.createElement(
+            'div',
+            {
+              style: {
+                display: 'flex',
+                gap: '1.5rem',
+                transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                transform: `translateX(-${currentSlide * 300}px)`
+              }
+            },
+            caseStudiesData.map((item) =>
+              React.createElement(
+                'div',
+                {
+                  key: item.id,
+                  style: { flex: '0 0 auto', width: '280px' }
+                },
+                React.createElement(
+                  'a',
+                  {
+                    href: item.href,
+                    className: 'group rounded-xl shimmer-card hover-lift',
+                    style: { textDecoration: 'none', display: 'block', borderRadius: '12px', overflow: 'hidden' }
+                  },
+                  React.createElement(
+                    'div',
+                    {
+                      className: 'glass-panel',
+                      style: {
+                        position: 'relative',
+                        height: '380px',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-end',
+                        background: 'var(--glass-bg)',
+                        border: '1px solid var(--border-color)'
+                      }
+                    },
+                    // Background Image
+                    React.createElement('img', {
+                      src: item.image,
+                      alt: item.title,
+                      style: {
+                        position: 'absolute',
+                        top: '0',
+                        left: '0',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        zIndex: '1',
+                        transition: 'transform 0.4s ease'
+                      },
+                      className: 'svg-animated'
+                    }),
+                    // Gradient Overlay
+                    React.createElement('div', {
+                      style: {
+                        position: 'absolute',
+                        inset: '0',
+                        background: 'linear-gradient(rgba(0,0,0,0) 20%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.9) 100%)',
+                        zIndex: '2'
+                      }
+                    }),
+                    // Content
+                    React.createElement(
+                      'div',
+                      {
+                        style: {
+                          position: 'relative',
+                          zIndex: '3',
+                          padding: '1.5rem',
+                          color: '#ffffff',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.6rem'
+                        }
+                      },
+                      React.createElement('h4', { style: { fontSize: '1.1rem', fontWeight: '800', margin: '0', color: '#ffffff', lineHeight: '1.3' } }, item.title),
+                      React.createElement('p', { style: { fontSize: '0.8rem', opacity: '0.85', margin: '0', lineHeight: '1.4', color: '#f0f0f0' } }, item.description),
+                      React.createElement(
+                        'div',
+                        {
+                          style: {
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            color: 'var(--primary-color)',
+                            marginTop: '0.4rem',
+                            gap: '0.3rem'
+                          }
+                        },
+                        'Read more',
+                        React.createElement('svg', { width: '14', height: '14', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2.5', strokeLinecap: 'round', strokeLinejoin: 'round' },
+                          React.createElement('line', { x1: '5', y1: '12', x2: '19', y2: '12' }),
+                          React.createElement('polyline', { points: '12 5 19 12 12 19' })
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ),
+
+        // INDICATOR DOTS
+        React.createElement(
+          'div',
+          { style: { display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1.5rem' } },
+          caseStudiesData.map((_, index) =>
+            React.createElement('button', {
+              key: index,
+              onClick: () => setCurrentSlide(index),
+              style: {
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                border: 'none',
+                padding: '0',
+                cursor: 'pointer',
+                background: currentSlide === index ? 'var(--primary-color)' : 'rgba(76, 175, 80, 0.2)',
+                transition: 'background 0.3s ease'
+              },
+              'aria-label': `Go to slide ${index + 1}`
+            })
           )
         )
       )
