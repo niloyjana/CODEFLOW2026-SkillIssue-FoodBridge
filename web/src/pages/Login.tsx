@@ -362,7 +362,15 @@ export const Login: React.FC = () => {
         },
         React.createElement(
           'div',
-          { style: { position: 'relative', width: '480px', height: '360px' } },
+          {
+            style: {
+              position: 'relative',
+              width: '480px',
+              height: '360px',
+              transform: 'scale(1.4)',
+              transformOrigin: 'bottom center'
+            }
+          },
           
           // Purple character
           React.createElement(
@@ -568,14 +576,7 @@ export const Login: React.FC = () => {
         )
       ),
 
-      // Footer Links
-      React.createElement(
-        'div',
-        { style: { display: 'flex', gap: '1.5rem', fontSize: '0.8rem', color: 'var(--text-secondary)' } },
-        React.createElement('span', null, 'Privacy Policy'),
-        React.createElement('span', null, 'Terms of Service'),
-        React.createElement('span', null, 'Support Center')
-      )
+
     ),
 
     // RIGHT HALF: CLEAN VERTICALLY CENTERED LOGIN FORM (NO CARD BOX OR BORDERS)
