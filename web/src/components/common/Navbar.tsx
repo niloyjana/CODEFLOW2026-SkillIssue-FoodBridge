@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import Icons from './Icons';
+import AnimatedThemeToggle from './AnimatedThemeToggle';
 
 export const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -45,7 +46,7 @@ export const Navbar: React.FC = () => {
     ),
     React.createElement(
       'div',
-      { className: 'navbar-links' },
+      { className: 'navbar-links', style: { display: 'flex', alignItems: 'center', gap: '1.2rem' } },
       user ? React.createElement(
         React.Fragment,
         null,
@@ -83,9 +84,10 @@ export const Navbar: React.FC = () => {
           },
           'About Us'
         ),
+        React.createElement(AnimatedThemeToggle, { className: 'nav-theme-toggle' }),
         React.createElement(
           'div',
-          { className: 'nav-user-info' },
+          { className: 'nav-user-info', style: { display: 'flex', alignItems: 'center', gap: '0.8rem' } },
           React.createElement(
             'span',
             { className: 'user-badge' },
@@ -108,12 +110,17 @@ export const Navbar: React.FC = () => {
           )
         )
       ) : React.createElement(
-        NavLink,
-        {
-          to: '/login',
-          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
-        },
-        'Login'
+        React.Fragment,
+        null,
+        React.createElement(AnimatedThemeToggle, { className: 'nav-theme-toggle' }),
+        React.createElement(
+          NavLink,
+          {
+            to: '/login',
+            className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
+          },
+          'Login'
+        )
       )
     )
   );
