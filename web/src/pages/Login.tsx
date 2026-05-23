@@ -14,8 +14,8 @@ interface PupilProps {
 }
 
 const Pupil: React.FC<PupilProps> = ({ 
-  size = 8, 
-  maxDistance = 3,
+  size = 12, 
+  maxDistance = 5,
   pupilColor = "black",
   forceLookX,
   forceLookY
@@ -77,9 +77,9 @@ interface EyeBallProps {
 }
 
 const EyeBall: React.FC<EyeBallProps> = ({ 
-  size = 12, 
-  pupilSize = 4, 
-  maxDistance = 3,
+  size = 16, 
+  pupilSize = 6, 
+  maxDistance = 4,
   eyeColor = "white",
   pupilColor = "black",
   isBlinking = false,
@@ -250,9 +250,9 @@ export const Login: React.FC = () => {
     const deltaX = mouseX - centerX;
     const deltaY = mouseY - centerY;
 
-    const faceX = Math.max(-8, Math.min(8, deltaX / 30));
-    const faceY = Math.max(-6, Math.min(6, deltaY / 40));
-    const bodySkew = Math.max(-3, Math.min(3, -deltaX / 180));
+    const faceX = Math.max(-12, Math.min(12, deltaX / 20));
+    const faceY = Math.max(-10, Math.min(10, deltaY / 30));
+    const bodySkew = Math.max(-4, Math.min(4, -deltaX / 140));
 
     return { faceX, faceY, bodySkew };
   };
@@ -276,334 +276,336 @@ export const Login: React.FC = () => {
     }
   };
 
-
+  const handleQuickLogin = async (selectedRole: UserType, emailAddr: string) => {
+    setRole(selectedRole);
+    setEmail(emailAddr);
+    setLoading(true);
+    try {
+      await login(emailAddr, selectedRole);
+      navigate('/#about-us');
+    } catch (err) {
+      console.error(err);
+      alert('Quick login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return React.createElement(
     'div',
     {
       style: {
-        height: 'calc(100vh - 75px)', // locks exactly to screen minus global navigation bar height
+        height: 'calc(100vh - 70px)', // matches exactly viewport height below the global navigation bar
         width: '100%',
         maxWidth: '100%',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: 'row',
         background: 'var(--bg-primary)',
         overflow: 'hidden',
         boxSizing: 'border-box',
         margin: '0',
-        padding: '1rem'
+        padding: '0'
       }
     },
 
-    // DUAL CARD WRAPPER - SIDE BY SIDE WITH EQUAL HEIGHT STRETCH
+    // LEFT HALF: TALL BACKDROP PANEL WITH PROMINENT CHARACTERS
+    React.createElement(
+      'div',
+      {
+        className: 'hidden lg:flex',
+        style: {
+          flex: '1',
+          background: 'linear-gradient(135deg, rgba(76, 175, 80, 0.05) 0%, rgba(139, 195, 74, 0.05) 100%)',
+          borderRight: '1px solid var(--border-light)',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '3rem',
+          position: 'relative',
+          overflow: 'hidden',
+          height: '100%',
+          boxSizing: 'border-box'
+        }
+      },
+      
+      // Branding Header
+      React.createElement(
+        'div',
+        { style: { zIndex: '10', display: 'flex', alignItems: 'center', gap: '0.6rem' } },
+        React.createElement(Icons.Logo, { size: 36 }),
+        React.createElement('span', { style: { fontWeight: '700', fontSize: '1.2rem', color: 'var(--primary-color)' } }, 'FoodBridge')
+      ),
+
+      // Character assembly standing directly on the floor
+      React.createElement(
+        'div',
+        {
+          style: {
+            zIndex: '10',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            height: '420px',
+            position: 'relative',
+            boxSizing: 'border-box'
+          }
+        },
+        React.createElement(
+          'div',
+          { style: { position: 'relative', width: '480px', height: '360px' } },
+          
+          // Purple character
+          React.createElement(
+            'div',
+            {
+              ref: purpleRef,
+              style: {
+                position: 'absolute',
+                bottom: '0',
+                left: '60px',
+                width: '160px',
+                height: (isTyping || (password.length > 0 && !showPassword)) ? '390px' : '350px',
+                backgroundColor: '#6C3FF5',
+                borderRadius: '10px 10px 0 0',
+                zIndex: '1',
+                transform: (password.length > 0 && showPassword)
+                  ? 'skewX(0deg)'
+                  : (isTyping || (password.length > 0 && !showPassword))
+                    ? `skewX(${(purplePos.bodySkew || 0) - 10}deg) translateX(30px)`
+                    : `skewX(${purplePos.bodySkew || 0}deg)`,
+                transformOrigin: 'bottom center',
+                transition: 'height 0.4s ease, transform 0.4s ease'
+              }
+            },
+            React.createElement(
+              'div',
+              {
+                style: {
+                  position: 'absolute',
+                  display: 'flex',
+                  gap: '2rem',
+                  left: (password.length > 0 && showPassword) ? '20px' : isLookingAtEachOther ? '50px' : `${40 + purplePos.faceX}px`,
+                  top: (password.length > 0 && showPassword) ? '30px' : isLookingAtEachOther ? '55px' : `${35 + purplePos.faceY}px`,
+                  transition: 'left 0.4s ease, top 0.4s ease'
+                }
+              },
+              React.createElement(EyeBall, {
+                size: 16,
+                pupilSize: 6,
+                maxDistance: 4,
+                eyeColor: 'white',
+                pupilColor: '#2D2D2D',
+                isBlinking: isPurpleBlinking,
+                forceLookX: (password.length > 0 && showPassword) ? (isPurplePeeking ? 4 : -4) : isLookingAtEachOther ? 3 : undefined,
+                forceLookY: (password.length > 0 && showPassword) ? (isPurplePeeking ? 5 : -4) : isLookingAtEachOther ? 4 : undefined
+              }),
+              React.createElement(EyeBall, {
+                size: 16,
+                pupilSize: 6,
+                maxDistance: 4,
+                eyeColor: 'white',
+                pupilColor: '#2D2D2D',
+                isBlinking: isPurpleBlinking,
+                forceLookX: (password.length > 0 && showPassword) ? (isPurplePeeking ? 4 : -4) : isLookingAtEachOther ? 3 : undefined,
+                forceLookY: (password.length > 0 && showPassword) ? (isPurplePeeking ? 5 : -4) : isLookingAtEachOther ? 4 : undefined
+              })
+            )
+          ),
+
+          // Black character
+          React.createElement(
+            'div',
+            {
+              ref: blackRef,
+              style: {
+                position: 'absolute',
+                bottom: '0',
+                left: '210px',
+                width: '110px',
+                height: '280px',
+                backgroundColor: '#2D2D2D',
+                borderRadius: '8px 8px 0 0',
+                zIndex: '2',
+                transform: (password.length > 0 && showPassword)
+                  ? 'skewX(0deg)'
+                  : isLookingAtEachOther
+                    ? `skewX(${(blackPos.bodySkew || 0) * 1.5 + 8}deg) translateX(15px)`
+                    : (isTyping || (password.length > 0 && !showPassword))
+                      ? `skewX(${(blackPos.bodySkew || 0) * 1.5}deg)`
+                      : `skewX(${blackPos.bodySkew || 0}deg)`,
+                transformOrigin: 'bottom center',
+                transition: 'transform 0.4s ease'
+              }
+            },
+            React.createElement(
+              'div',
+              {
+                style: {
+                  position: 'absolute',
+                  display: 'flex',
+                  gap: '1.5rem',
+                  left: (password.length > 0 && showPassword) ? '10px' : isLookingAtEachOther ? '28px' : `${22 + blackPos.faceX}px`,
+                  top: (password.length > 0 && showPassword) ? '25px' : isLookingAtEachOther ? '12px' : `${28 + blackPos.faceY}px`,
+                  transition: 'left 0.4s ease, top 0.4s ease'
+                }
+              },
+              React.createElement(EyeBall, {
+                size: 14,
+                pupilSize: 5,
+                maxDistance: 3,
+                eyeColor: 'white',
+                pupilColor: '#2D2D2D',
+                isBlinking: isBlackBlinking,
+                forceLookX: (password.length > 0 && showPassword) ? -4 : isLookingAtEachOther ? 0 : undefined,
+                forceLookY: (password.length > 0 && showPassword) ? -4 : isLookingAtEachOther ? -4 : undefined
+              }),
+              React.createElement(EyeBall, {
+                size: 14,
+                pupilSize: 5,
+                maxDistance: 3,
+                eyeColor: 'white',
+                pupilColor: '#2D2D2D',
+                isBlinking: isBlackBlinking,
+                forceLookX: (password.length > 0 && showPassword) ? -4 : isLookingAtEachOther ? 0 : undefined,
+                forceLookY: (password.length > 0 && showPassword) ? -4 : isLookingAtEachOther ? -4 : undefined
+              })
+            )
+          ),
+
+          // Orange character
+          React.createElement(
+            'div',
+            {
+              ref: orangeRef,
+              style: {
+                position: 'absolute',
+                bottom: '0',
+                left: '0px',
+                width: '210px',
+                height: '170px',
+                backgroundColor: '#FF9B6B',
+                borderRadius: '100px 100px 0 0',
+                zIndex: '3',
+                transform: (password.length > 0 && showPassword) ? 'skewX(0deg)' : `skewX(${orangePos.bodySkew || 0}deg)`,
+                transformOrigin: 'bottom center',
+                transition: 'transform 0.4s ease'
+              }
+            },
+            React.createElement(
+              'div',
+              {
+                style: {
+                  position: 'absolute',
+                  display: 'flex',
+                  gap: '2rem',
+                  left: (password.length > 0 && showPassword) ? '40px' : `${70 + orangePos.faceX}px`,
+                  top: (password.length > 0 && showPassword) ? '75px' : `${80 + orangePos.faceY}px`,
+                  transition: 'left 0.4s ease, top 0.4s ease'
+                }
+              },
+              React.createElement(Pupil, { size: 10, maxDistance: 4, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -5 : undefined, forceLookY: (password.length > 0 && showPassword) ? -4 : undefined }),
+              React.createElement(Pupil, { size: 10, maxDistance: 4, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -5 : undefined, forceLookY: (password.length > 0 && showPassword) ? -4 : undefined })
+            )
+          ),
+
+          // Yellow character
+          React.createElement(
+            'div',
+            {
+              ref: yellowRef,
+              style: {
+                position: 'absolute',
+                bottom: '0',
+                left: '270px',
+                width: '130px',
+                height: '200px',
+                backgroundColor: '#E8D754',
+                borderRadius: '60px 60px 0 0',
+                zIndex: '4',
+                transform: (password.length > 0 && showPassword) ? 'skewX(0deg)' : `skewX(${yellowPos.bodySkew || 0}deg)`,
+                transformOrigin: 'bottom center',
+                transition: 'transform 0.4s ease'
+              }
+            },
+            React.createElement(
+              'div',
+              {
+                style: {
+                  position: 'absolute',
+                  display: 'flex',
+                  gap: '1.5rem',
+                  left: (password.length > 0 && showPassword) ? '15px' : `${45 + yellowPos.faceX}px`,
+                  top: (password.length > 0 && showPassword) ? '30px' : `${35 + yellowPos.faceY}px`,
+                  transition: 'left 0.4s ease, top 0.4s ease'
+                }
+              },
+              React.createElement(Pupil, { size: 10, maxDistance: 4, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -5 : undefined, forceLookY: (password.length > 0 && showPassword) ? -4 : undefined }),
+              React.createElement(Pupil, { size: 10, maxDistance: 4, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -5 : undefined, forceLookY: (password.length > 0 && showPassword) ? -4 : undefined })
+            ),
+            React.createElement('div', {
+              style: {
+                position: 'absolute',
+                width: '70px',
+                height: '4px',
+                backgroundColor: '#2D2D2D',
+                borderRadius: '2px',
+                left: (password.length > 0 && showPassword) ? '10px' : `${35 + yellowPos.faceX}px`,
+                top: (password.length > 0 && showPassword) ? '78px' : `${78 + yellowPos.faceY}px`,
+                transition: 'left 0.4s ease, top 0.4s ease'
+              }
+            })
+          )
+        )
+      ),
+
+      // Footer Links
+      React.createElement(
+        'div',
+        { style: { display: 'flex', gap: '1.5rem', fontSize: '0.8rem', color: 'var(--text-secondary)' } },
+        React.createElement('span', null, 'Privacy Policy'),
+        React.createElement('span', null, 'Terms of Service'),
+        React.createElement('span', null, 'Support Center')
+      )
+    ),
+
+    // RIGHT HALF: CLEAN VERTICALLY CENTERED LOGIN FORM (NO CARD BOX OR BORDERS)
     React.createElement(
       'div',
       {
         style: {
+          flex: '1',
           display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'stretch', // ensures left green box and right form card align perfectly at same height
+          flexDirection: 'column',
           justifyContent: 'center',
-          gap: '2.5rem',
-          width: '100%',
-          maxWidth: '820px',
-          height: '470px', // exact uniform locks to prevent any viewport scrolling
-          boxSizing: 'border-box'
+          alignItems: 'center',
+          padding: '3rem',
+          height: '100%',
+          boxSizing: 'border-box',
+          overflow: 'hidden'
         }
       },
-
-      // LEFT COLUMN: ILLUSTRATED GREEN CARD
       React.createElement(
         'div',
         {
-          className: 'hidden lg:flex',
           style: {
-            flex: '1',
-            background: 'rgba(76, 175, 80, 0.05)',
-            border: '1px solid rgba(76, 175, 80, 0.15)',
-            borderRadius: 'var(--radius-lg)',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: '1.5rem',
-            boxSizing: 'border-box',
-            position: 'relative',
-            overflow: 'hidden',
-            paddingTop: '2rem' // fits container header spacing cleanly
-          }
-        },
-        
-        // Brand logo
-        React.createElement(
-          'div',
-          { style: { zIndex: '10', display: 'flex', alignItems: 'center', gap: '0.4rem' } },
-          React.createElement(Icons.Logo, { size: 28 }),
-          React.createElement('span', { style: { fontWeight: '700', fontSize: '1rem', color: 'var(--primary-color)' } }, 'FoodBridge')
-        ),
-
-        // Animated illustrated characters container
-        React.createElement(
-          'div',
-          {
-            style: {
-              zIndex: '10',
-              display: 'flex',
-              alignItems: 'flex-end',
-              justifyContent: 'center',
-              height: '240px',
-              position: 'relative',
-              boxSizing: 'border-box',
-              paddingTop: '3.5rem' // pushes Illustrated blob characters downward to sit closer to floor
-            }
-          },
-          React.createElement(
-            'div',
-            { style: { position: 'relative', width: '280px', height: '180px' } },
-            
-            // Purple character
-            React.createElement(
-              'div',
-              {
-                ref: purpleRef,
-                style: {
-                  position: 'absolute',
-                  bottom: '0',
-                  left: '40px',
-                  width: '90px',
-                  height: (isTyping || (password.length > 0 && !showPassword)) ? '210px' : '190px',
-                  backgroundColor: '#6C3FF5',
-                  borderRadius: '8px 8px 0 0',
-                  zIndex: '1',
-                  transform: (password.length > 0 && showPassword)
-                    ? 'skewX(0deg)'
-                    : (isTyping || (password.length > 0 && !showPassword))
-                      ? `skewX(${(purplePos.bodySkew || 0) - 8}deg) translateX(20px)`
-                      : `skewX(${purplePos.bodySkew || 0}deg)`,
-                  transformOrigin: 'bottom center',
-                  transition: 'height 0.4s ease, transform 0.4s ease'
-                }
-              },
-              React.createElement(
-                'div',
-                {
-                  style: {
-                    position: 'absolute',
-                    display: 'flex',
-                    gap: '1.2rem',
-                    left: (password.length > 0 && showPassword) ? '12px' : isLookingAtEachOther ? '25px' : `${20 + purplePos.faceX}px`,
-                    top: (password.length > 0 && showPassword) ? '15px' : isLookingAtEachOther ? '35px' : `${22 + purplePos.faceY}px`,
-                    transition: 'left 0.4s ease, top 0.4s ease'
-                  }
-                },
-                React.createElement(EyeBall, {
-                  size: 10,
-                  pupilSize: 3.5,
-                  maxDistance: 2,
-                  eyeColor: 'white',
-                  pupilColor: '#2D2D2D',
-                  isBlinking: isPurpleBlinking,
-                  forceLookX: (password.length > 0 && showPassword) ? (isPurplePeeking ? 2.5 : -2.5) : isLookingAtEachOther ? 2 : undefined,
-                  forceLookY: (password.length > 0 && showPassword) ? (isPurplePeeking ? 3 : -2.5) : isLookingAtEachOther ? 2.5 : undefined
-                }),
-                React.createElement(EyeBall, {
-                  size: 10,
-                  pupilSize: 3.5,
-                  maxDistance: 2,
-                  eyeColor: 'white',
-                  pupilColor: '#2D2D2D',
-                  isBlinking: isPurpleBlinking,
-                  forceLookX: (password.length > 0 && showPassword) ? (isPurplePeeking ? 2.5 : -2.5) : isLookingAtEachOther ? 2 : undefined,
-                  forceLookY: (password.length > 0 && showPassword) ? (isPurplePeeking ? 3 : -2.5) : isLookingAtEachOther ? 2.5 : undefined
-                })
-              )
-            ),
-
-            // Black character
-            React.createElement(
-              'div',
-              {
-                ref: blackRef,
-                style: {
-                  position: 'absolute',
-                  bottom: '0',
-                  left: '145px',
-                  width: '65px',
-                  height: '150px',
-                  backgroundColor: '#2D2D2D',
-                  borderRadius: '6px 6px 0 0',
-                  zIndex: '2',
-                  transform: (password.length > 0 && showPassword)
-                    ? 'skewX(0deg)'
-                    : isLookingAtEachOther
-                      ? `skewX(${(blackPos.bodySkew || 0) * 1.5 + 4}deg) translateX(8px)`
-                      : (isTyping || (password.length > 0 && !showPassword))
-                        ? `skewX(${(blackPos.bodySkew || 0) * 1.5}deg)`
-                        : `skewX(${blackPos.bodySkew || 0}deg)`,
-                  transformOrigin: 'bottom center',
-                  transition: 'transform 0.4s ease'
-                }
-              },
-              React.createElement(
-                'div',
-                {
-                  style: {
-                    position: 'absolute',
-                    display: 'flex',
-                    gap: '0.8rem',
-                    left: (password.length > 0 && showPassword) ? '6px' : isLookingAtEachOther ? '16px' : `${10 + blackPos.faceX}px`,
-                    top: (password.length > 0 && showPassword) ? '12px' : isLookingAtEachOther ? '6px' : `${15 + blackPos.faceY}px`,
-                    transition: 'left 0.4s ease, top 0.4s ease'
-                  }
-                },
-                React.createElement(EyeBall, {
-                  size: 9,
-                  pupilSize: 3,
-                  maxDistance: 1.5,
-                  eyeColor: 'white',
-                  pupilColor: '#2D2D2D',
-                  isBlinking: isBlackBlinking,
-                  forceLookX: (password.length > 0 && showPassword) ? -2.5 : isLookingAtEachOther ? 0 : undefined,
-                  forceLookY: (password.length > 0 && showPassword) ? -2.5 : isLookingAtEachOther ? -2.5 : undefined
-                }),
-                React.createElement(EyeBall, {
-                  size: 9,
-                  pupilSize: 3,
-                  maxDistance: 1.5,
-                  eyeColor: 'white',
-                  pupilColor: '#2D2D2D',
-                  isBlinking: isBlackBlinking,
-                  forceLookX: (password.length > 0 && showPassword) ? -2.5 : isLookingAtEachOther ? 0 : undefined,
-                  forceLookY: (password.length > 0 && showPassword) ? -2.5 : isLookingAtEachOther ? -2.5 : undefined
-                })
-              )
-            ),
-
-            // Orange character
-            React.createElement(
-              'div',
-              {
-                ref: orangeRef,
-                style: {
-                  position: 'absolute',
-                  bottom: '0',
-                  left: '0px',
-                  width: '120px',
-                  height: '90px',
-                  backgroundColor: '#FF9B6B',
-                  borderRadius: '60px 60px 0 0',
-                  zIndex: '3',
-                  transform: (password.length > 0 && showPassword) ? 'skewX(0deg)' : `skewX(${orangePos.bodySkew || 0}deg)`,
-                  transformOrigin: 'bottom center',
-                  transition: 'transform 0.4s ease'
-                }
-              },
-              React.createElement(
-                'div',
-                {
-                  style: {
-                    position: 'absolute',
-                    display: 'flex',
-                    gap: '1rem',
-                    left: (password.length > 0 && showPassword) ? '22px' : `${40 + orangePos.faceX}px`,
-                    top: (password.length > 0 && showPassword) ? '35px' : `${40 + orangePos.faceY}px`,
-                    transition: 'left 0.4s ease, top 0.4s ease'
-                  }
-                },
-                React.createElement(Pupil, { size: 6, maxDistance: 2, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -3 : undefined, forceLookY: (password.length > 0 && showPassword) ? -2 : undefined }),
-                React.createElement(Pupil, { size: 6, maxDistance: 2, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -3 : undefined, forceLookY: (password.length > 0 && showPassword) ? -2 : undefined })
-              )
-            ),
-
-            // Yellow character
-            React.createElement(
-              'div',
-              {
-                ref: yellowRef,
-                style: {
-                  position: 'absolute',
-                  bottom: '0',
-                  left: '185px',
-                  width: '75px',
-                  height: '110px',
-                  backgroundColor: '#E8D754',
-                  borderRadius: '35px 35px 0 0',
-                  zIndex: '4',
-                  transform: (password.length > 0 && showPassword) ? 'skewX(0deg)' : `skewX(${yellowPos.bodySkew || 0}deg)`,
-                  transformOrigin: 'bottom center',
-                  transition: 'transform 0.4s ease'
-                }
-              },
-              React.createElement(
-                'div',
-                {
-                  style: {
-                    position: 'absolute',
-                    display: 'flex',
-                    gap: '0.8rem',
-                    left: (password.length > 0 && showPassword) ? '8px' : `${20 + yellowPos.faceX}px`,
-                    top: (password.length > 0 && showPassword) ? '18px' : `${20 + yellowPos.faceY}px`,
-                    transition: 'left 0.4s ease, top 0.4s ease'
-                  }
-                },
-                React.createElement(Pupil, { size: 6, maxDistance: 2, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -3 : undefined, forceLookY: (password.length > 0 && showPassword) ? -2 : undefined }),
-                React.createElement(Pupil, { size: 6, maxDistance: 2, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -3 : undefined, forceLookY: (password.length > 0 && showPassword) ? -2 : undefined })
-              ),
-              React.createElement('div', {
-                style: {
-                  position: 'absolute',
-                  width: '35px',
-                  height: '3px',
-                  backgroundColor: '#2D2D2D',
-                  borderRadius: '2px',
-                  left: (password.length > 0 && showPassword) ? '8px' : `${18 + yellowPos.faceX}px`,
-                  top: (password.length > 0 && showPassword) ? '40px' : `${40 + yellowPos.faceY}px`,
-                  transition: 'left 0.4s ease, top 0.4s ease'
-                }
-              })
-            )
-          )
-        ),
-
-        // Small footer text links
-        React.createElement(
-          'div',
-          { style: { display: 'flex', gap: '0.8rem', fontSize: '0.7rem', color: 'var(--text-secondary)', justifyContent: 'center' } },
-          React.createElement('span', null, 'Privacy Policy'),
-          React.createElement('span', null, 'Terms of Service'),
-          React.createElement('span', null, 'Support Center')
-        )
-      ),
-
-      // RIGHT COLUMN: WHITE FORM CARD
-      React.createElement(
-        'div',
-        {
-          className: 'auth-card glass-panel hover-lift mask-reveal',
-          style: {
-            flex: '1',
+            width: '100%',
             maxWidth: '380px',
-            padding: '1.5rem',
-            borderRadius: 'var(--radius-lg)',
             boxSizing: 'border-box',
-            background: 'var(--glass-bg)',
-            border: '1px solid var(--border-color)',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
-            height: '100%' // stretches to full height of parent wrapper exactly
+            gap: '1.5rem'
           }
         },
         React.createElement(
           'div',
-          { className: 'auth-header', style: { textAlign: 'center', marginBottom: '1.2rem' } },
-          React.createElement(Icons.Logo, { size: 36, style: { marginBottom: '0.4rem' } }),
-          React.createElement('h2', { style: { fontSize: '1.5rem', fontWeight: '800', fontFamily: 'var(--font-heading)', margin: '0 0 0.2rem 0' } }, 'Welcome Back'),
-          React.createElement('p', { style: { fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0' } }, 'Enter your credentials to access FoodBridge')
+          { className: 'auth-header', style: { textAlign: 'center' } },
+          React.createElement(Icons.Logo, { size: 42, style: { marginBottom: '0.6rem' } }),
+          React.createElement('h2', { style: { fontSize: '1.8rem', fontWeight: '800', fontFamily: 'var(--font-heading)', margin: '0 0 0.3rem 0' } }, 'Welcome Back'),
+          React.createElement('p', { style: { fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0' } }, 'Enter your credentials to access FoodBridge')
         ),
 
         React.createElement(
           'form',
-          { onSubmit: handleSubmit, style: { display: 'flex', flexDirection: 'column', gap: '0.9rem' } },
+          { onSubmit: handleSubmit, style: { display: 'flex', flexDirection: 'column', gap: '1.1rem' } },
           
           // ROLE SELECTOR
           React.createElement(
@@ -617,8 +619,8 @@ export const Login: React.FC = () => {
                 onClick: () => setRole('restaurant'),
                 style: {
                   flex: '1',
-                  padding: '0.4rem',
-                  fontSize: '0.8rem',
+                  padding: '0.5rem',
+                  fontSize: '0.85rem',
                   border: 'none',
                   borderRadius: '6px',
                   background: role === 'restaurant' ? 'var(--bg-primary)' : 'transparent',
@@ -628,11 +630,11 @@ export const Login: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '0.3rem',
+                  gap: '0.4rem',
                   transition: 'all 0.3s ease'
                 }
               },
-              React.createElement(Icons.Utensils, { size: 12 }),
+              React.createElement(Icons.Utensils, { size: 14 }),
               'Restaurant'
             ),
             React.createElement(
@@ -643,8 +645,8 @@ export const Login: React.FC = () => {
                 onClick: () => setRole('individual'),
                 style: {
                   flex: '1',
-                  padding: '0.4rem',
-                  fontSize: '0.8rem',
+                  padding: '0.5rem',
+                  fontSize: '0.85rem',
                   border: 'none',
                   borderRadius: '6px',
                   background: role === 'individual' ? 'var(--bg-primary)' : 'transparent',
@@ -654,11 +656,11 @@ export const Login: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '0.3rem',
+                  gap: '0.4rem',
                   transition: 'all 0.3s ease'
                 }
               },
-              React.createElement(Icons.Heart, { size: 12 }),
+              React.createElement(Icons.Heart, { size: 14 }),
               'Individual'
             )
           ),
@@ -666,8 +668,8 @@ export const Login: React.FC = () => {
           // EMAIL INPUT
           React.createElement(
             'div',
-            { style: { display: 'flex', flexDirection: 'column', gap: '0.3rem' } },
-            React.createElement('label', { style: { fontSize: '0.8rem', fontWeight: '600' } }, 'Email Address'),
+            { style: { display: 'flex', flexDirection: 'column', gap: '0.4rem' } },
+            React.createElement('label', { style: { fontSize: '0.85rem', fontWeight: '600' } }, 'Email Address'),
             React.createElement('input', {
               type: 'email',
               className: 'form-control glow-focus',
@@ -678,11 +680,11 @@ export const Login: React.FC = () => {
               onBlur: () => setIsTyping(false),
               required: true,
               style: {
-                height: '38px',
-                padding: '0 0.7rem',
+                height: '42px',
+                padding: '0 0.8rem',
                 borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--border-color)',
-                fontSize: '0.85rem',
+                fontSize: '0.9rem',
                 background: 'var(--bg-primary)'
               }
             })
@@ -691,8 +693,8 @@ export const Login: React.FC = () => {
           // PASSWORD INPUT
           React.createElement(
             'div',
-            { style: { display: 'flex', flexDirection: 'column', gap: '0.3rem' } },
-            React.createElement('label', { style: { fontSize: '0.8rem', fontWeight: '600' } }, 'Password'),
+            { style: { display: 'flex', flexDirection: 'column', gap: '0.4rem' } },
+            React.createElement('label', { style: { fontSize: '0.85rem', fontWeight: '600' } }, 'Password'),
             React.createElement(
               'div',
               { style: { position: 'relative' } },
@@ -706,12 +708,12 @@ export const Login: React.FC = () => {
                 onBlur: () => setIsTyping(false),
                 required: true,
                 style: {
-                  height: '38px',
+                  height: '42px',
                   width: '100%',
-                  padding: '0 2.2rem 0 0.7rem',
+                  padding: '0 2.5rem 0 0.8rem',
                   borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--border-color)',
-                  fontSize: '0.85rem',
+                  fontSize: '0.9rem',
                   background: 'var(--bg-primary)',
                   boxSizing: 'border-box'
                 }
@@ -723,7 +725,7 @@ export const Login: React.FC = () => {
                   onClick: () => setShowPassword(!showPassword),
                   style: {
                     position: 'absolute',
-                    right: '8px',
+                    right: '10px',
                     top: '50%',
                     transform: 'translateY(-50%)',
                     border: 'none',
@@ -734,11 +736,11 @@ export const Login: React.FC = () => {
                   }
                 },
                 showPassword
-                  ? React.createElement('svg', { width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' },
+                  ? React.createElement('svg', { width: '18', height: '18', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' },
                       React.createElement('path', { d: 'M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24' }),
                       React.createElement('line', { x1: '1', y1: '1', x2: '23', y2: '23' })
                     )
-                  : React.createElement('svg', { width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' },
+                  : React.createElement('svg', { width: '18', height: '18', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' },
                       React.createElement('path', { d: 'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z' }),
                       React.createElement('circle', { cx: '12', cy: '12', r: '3' })
                     )
@@ -753,18 +755,49 @@ export const Login: React.FC = () => {
               type: 'submit',
               className: 'btn-premium',
               disabled: loading,
-              style: { height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: '700', marginTop: '0.3rem' }
+              style: { height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.92rem', fontWeight: '700', marginTop: '0.5rem' }
             },
             loading ? 'Verifying Account...' : 'Log In'
           )
         ),
 
-
+        // QUICK DEMO LOGINS BLOCK
+        React.createElement(
+          'div',
+          { style: { borderTop: '1px solid var(--border-light)', marginTop: '1.2rem', paddingTop: '1rem' } },
+          React.createElement('p', { style: { fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '0.6rem', fontWeight: '600' } }, 'Quick Demo Accounts'),
+          React.createElement(
+            'div',
+            { style: { display: 'flex', gap: '0.5rem' } },
+            React.createElement(
+              Button,
+              {
+                type: 'button',
+                variant: 'secondary',
+                style: { flex: '1', fontSize: '0.75rem', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' },
+                onClick: () => handleQuickLogin('restaurant', 'restaurant@foodbridge.com')
+              },
+              React.createElement(Icons.Utensils, { size: 11 }),
+              'As Restaurant'
+            ),
+            React.createElement(
+              Button,
+              {
+                type: 'button',
+                variant: 'secondary',
+                style: { flex: '1', fontSize: '0.75rem', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' },
+                onClick: () => handleQuickLogin('individual', 'individual@foodbridge.com')
+              },
+              React.createElement(Icons.Heart, { size: 11 }),
+              'As Individual'
+            )
+          )
+        ),
 
         // REGISTER DIRECT LINK
         React.createElement(
           'div',
-          { style: { textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '1rem' } },
+          { style: { textAlign: 'center', fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '1.2rem' } },
           "Don't have an account yet? ",
           React.createElement('a', { href: '/register', style: { color: 'var(--primary-color)', fontWeight: '700', textDecoration: 'none' } }, 'Register here')
         )
