@@ -35,3 +35,6 @@ yarn-error.log*
 
 # Auto-generated code sync folder (copied from shared/ in prestart/prebuild hooks)
 web/src/shared/
+
+# Firebase credentials
+backend/serviceAccountKey.json

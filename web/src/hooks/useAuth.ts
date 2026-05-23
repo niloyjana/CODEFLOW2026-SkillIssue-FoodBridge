@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserType } from 'shared/types';
 import { apiService } from '../services/api';
+import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
+import { auth } from '../config/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -18,11 +20,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const session = apiService.getCurrentSession();
-    if (session) {
-      setUser(session);
-    }
-    setLoading(false);
+    // Keep local session in sync with Firebase Auth state
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        const session = apiService.getCurrentSession();
+        if (session) {
+          setUser(session);
+        }
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, []);
 
   const login = async (email: string, type: UserType) => {
