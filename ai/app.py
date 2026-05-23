@@ -46,8 +46,16 @@ def predict():
 
         prediction = model.predict(features)[0]
 
-        confidence = 0.85 if prediction < 20 else 0.70
-        confidence = min(0.95, max(0.60, confidence))
+        # Calculate true prediction confidence based on the variance/standard deviation of estimator tree predictions
+        tree_predictions = np.array([tree.predict(features)[0] for tree in model.estimators_])
+        std_dev = np.std(tree_predictions)
+        
+        # Relative deviation of tree predictions (higher relative deviation = lower confidence)
+        relative_dev = std_dev / max(1.0, prediction)
+        
+        # Map relative deviation to a dynamic confidence score between 0.60 and 0.95
+        confidence = 0.95 - (relative_dev * 0.4)
+        confidence = round(float(min(0.95, max(0.60, confidence))), 2)
 
         return jsonify({
             'predictedKg': round(prediction, 1),

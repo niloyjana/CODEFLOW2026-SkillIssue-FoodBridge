@@ -163,12 +163,27 @@ export const apiService = {
     console.log(`API Call to POST ${ENDPOINTS.posts} (MOCK)`, postData);
     await new Promise((resolve) => setTimeout(resolve, 600));
 
-    // Simulate AI Prediction
-    console.log(`API Call to AI PREDICT ${ENDPOINTS.predict} (MOCK)`);
-    const portionsFactor = postData.portions * 0.18;
-    const capacityFactor = (postData.seatingCapacity / 100) * (postData.mealTime === 'dinner' ? 1.4 : 0.8);
-    const venueFactor = postData.venueType === 'fastfood' ? 0.9 : postData.venueType === 'restaurant' ? 0.5 : 0.2;
-    const predictedWasteKg = Math.max(0.5, parseFloat((portionsFactor + capacityFactor + venueFactor).toFixed(2)));
+    // Live or simulated AI Prediction
+    let predictedWasteKg = 0;
+    try {
+      const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+      console.log(`Calling live AI PREDICT ${ENDPOINTS.predict} for ${dayOfWeek}`);
+      const aiResponse = await axios.post(ENDPOINTS.predict, {
+        dayOfWeek,
+        mealTime: postData.mealTime,
+        venueType: postData.venueType,
+        seatingCapacity: postData.seatingCapacity,
+        portions: postData.portions
+      });
+      predictedWasteKg = aiResponse.data.predictedKg;
+      console.log(`Live AI Prediction successful: ${predictedWasteKg} kg`);
+    } catch (err) {
+      console.warn('Failed to call live AI prediction service, using local fallback:', err);
+      const portionsFactor = postData.portions * 0.18;
+      const capacityFactor = (postData.seatingCapacity / 100) * (postData.mealTime === 'dinner' ? 1.4 : 0.8);
+      const venueFactor = postData.venueType === 'fastfood' ? 0.9 : postData.venueType === 'restaurant' ? 0.5 : 0.2;
+      predictedWasteKg = Math.max(0.5, parseFloat((portionsFactor + capacityFactor + venueFactor).toFixed(2)));
+    }
 
     const posts: FoodPost[] = JSON.parse(localStorage.getItem(STORAGE_KEYS.POSTS) || '[]');
     const pickupTime = new Date();
