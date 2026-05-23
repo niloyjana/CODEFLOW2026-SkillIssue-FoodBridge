@@ -14,8 +14,8 @@ interface PupilProps {
 }
 
 const Pupil: React.FC<PupilProps> = ({ 
-  size = 10, 
-  maxDistance = 4,
+  size = 8, 
+  maxDistance = 3,
   pupilColor = "black",
   forceLookX,
   forceLookY
@@ -77,9 +77,9 @@ interface EyeBallProps {
 }
 
 const EyeBall: React.FC<EyeBallProps> = ({ 
-  size = 36, 
-  pupilSize = 12, 
-  maxDistance = 8,
+  size = 12, 
+  pupilSize = 4, 
+  maxDistance = 3,
   eyeColor = "white",
   pupilColor = "black",
   isBlinking = false,
@@ -124,7 +124,7 @@ const EyeBall: React.FC<EyeBallProps> = ({
       ref: eyeRef,
       style: {
         width: `${size}px`,
-        height: isBlinking ? '2px' : `${size}px`,
+        height: isBlinking ? '1px' : `${size}px`,
         backgroundColor: eyeColor,
         borderRadius: '50%',
         overflow: 'hidden',
@@ -250,9 +250,9 @@ export const Login: React.FC = () => {
     const deltaX = mouseX - centerX;
     const deltaY = mouseY - centerY;
 
-    const faceX = Math.max(-10, Math.min(10, deltaX / 25));
-    const faceY = Math.max(-8, Math.min(8, deltaY / 35));
-    const bodySkew = Math.max(-4, Math.min(4, -deltaX / 150));
+    const faceX = Math.max(-8, Math.min(8, deltaX / 30));
+    const faceY = Math.max(-6, Math.min(6, deltaY / 40));
+    const bodySkew = Math.max(-3, Math.min(3, -deltaX / 180));
 
     return { faceX, faceY, bodySkew };
   };
@@ -295,296 +295,315 @@ export const Login: React.FC = () => {
     'div',
     {
       style: {
-        height: '100vh',
+        height: 'calc(100vh - 75px)', // locks exactly to screen minus global navigation bar height
         width: '100%',
         maxWidth: '100%',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         background: 'var(--bg-primary)',
         overflow: 'hidden',
         boxSizing: 'border-box',
         margin: '0',
-        padding: '0'
+        padding: '1rem'
       }
     },
 
-    // LEFT SECTION: INTERACTIVE ANIME CHARACTERS
-    React.createElement(
-      'div',
-      {
-        className: 'hidden lg:flex',
-        style: {
-          background: 'linear-gradient(135deg, rgba(76, 175, 80, 0.08) 0%, rgba(139, 195, 74, 0.08) 100%)',
-          borderRight: '1px solid var(--border-light)',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: '2rem 3rem',
-          position: 'relative',
-          overflow: 'hidden',
-          height: '100%',
-          boxSizing: 'border-box'
-        }
-      },
-      React.createElement(
-        'div',
-        { style: { zIndex: '10', display: 'flex', alignItems: 'center', gap: '0.5rem' } },
-        React.createElement(Icons.Logo, { size: 32 }),
-        React.createElement('span', { style: { fontWeight: '700', fontSize: '1.1rem', color: 'var(--primary-color)' } }, 'FoodBridge')
-      ),
-
-      React.createElement(
-        'div',
-        {
-          style: {
-            zIndex: '10',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            height: '320px',
-            position: 'relative'
-          }
-        },
-        React.createElement(
-          'div',
-          { style: { position: 'relative', width: '380px', height: '280px' } },
-          
-          // Purple tall character - Back layer
-          React.createElement(
-            'div',
-            {
-              ref: purpleRef,
-              style: {
-                position: 'absolute',
-                bottom: '0',
-                left: '50px',
-                width: '130px',
-                height: (isTyping || (password.length > 0 && !showPassword)) ? '300px' : '270px',
-                backgroundColor: '#6C3FF5',
-                borderRadius: '10px 10px 0 0',
-                zIndex: '1',
-                transform: (password.length > 0 && showPassword)
-                  ? 'skewX(0deg)'
-                  : (isTyping || (password.length > 0 && !showPassword))
-                    ? `skewX(${(purplePos.bodySkew || 0) - 8}deg) translateX(20px)`
-                    : `skewX(${purplePos.bodySkew || 0}deg)`,
-                transformOrigin: 'bottom center',
-                transition: 'height 0.4s ease, transform 0.4s ease'
-              }
-            },
-            React.createElement(
-              'div',
-              {
-                style: {
-                  position: 'absolute',
-                  display: 'flex',
-                  gap: '1.5rem',
-                  left: (password.length > 0 && showPassword) ? '18px' : isLookingAtEachOther ? '42px' : `${32 + purplePos.faceX}px`,
-                  top: (password.length > 0 && showPassword) ? '25px' : isLookingAtEachOther ? '45px' : `${28 + purplePos.faceY}px`,
-                  transition: 'left 0.4s ease, top 0.4s ease'
-                }
-              },
-              React.createElement(EyeBall, {
-                size: 14,
-                pupilSize: 5,
-                maxDistance: 3,
-                eyeColor: 'white',
-                pupilColor: '#2D2D2D',
-                isBlinking: isPurpleBlinking,
-                forceLookX: (password.length > 0 && showPassword) ? (isPurplePeeking ? 3 : -3) : isLookingAtEachOther ? 2 : undefined,
-                forceLookY: (password.length > 0 && showPassword) ? (isPurplePeeking ? 4 : -3) : isLookingAtEachOther ? 3 : undefined
-              }),
-              React.createElement(EyeBall, {
-                size: 14,
-                pupilSize: 5,
-                maxDistance: 3,
-                eyeColor: 'white',
-                pupilColor: '#2D2D2D',
-                isBlinking: isPurpleBlinking,
-                forceLookX: (password.length > 0 && showPassword) ? (isPurplePeeking ? 3 : -3) : isLookingAtEachOther ? 2 : undefined,
-                forceLookY: (password.length > 0 && showPassword) ? (isPurplePeeking ? 4 : -3) : isLookingAtEachOther ? 3 : undefined
-              })
-            )
-          ),
-
-          // Black tall character - Middle layer
-          React.createElement(
-            'div',
-            {
-              ref: blackRef,
-              style: {
-                position: 'absolute',
-                bottom: '0',
-                left: '170px',
-                width: '90px',
-                height: '210px',
-                backgroundColor: '#2D2D2D',
-                borderRadius: '8px 8px 0 0',
-                zIndex: '2',
-                transform: (password.length > 0 && showPassword)
-                  ? 'skewX(0deg)'
-                  : isLookingAtEachOther
-                    ? `skewX(${(blackPos.bodySkew || 0) * 1.5 + 6}deg) translateX(10px)`
-                    : (isTyping || (password.length > 0 && !showPassword))
-                      ? `skewX(${(blackPos.bodySkew || 0) * 1.5}deg)`
-                      : `skewX(${blackPos.bodySkew || 0}deg)`,
-                transformOrigin: 'bottom center',
-                transition: 'transform 0.4s ease'
-              }
-            },
-            React.createElement(
-              'div',
-              {
-                style: {
-                  position: 'absolute',
-                  display: 'flex',
-                  gap: '1.2rem',
-                  left: (password.length > 0 && showPassword) ? '10px' : isLookingAtEachOther ? '22px' : `${18 + blackPos.faceX}px`,
-                  top: (password.length > 0 && showPassword) ? '20px' : isLookingAtEachOther ? '10px' : `${22 + blackPos.faceY}px`,
-                  transition: 'left 0.4s ease, top 0.4s ease'
-                }
-              },
-              React.createElement(EyeBall, {
-                size: 12,
-                pupilSize: 4,
-                maxDistance: 2,
-                eyeColor: 'white',
-                pupilColor: '#2D2D2D',
-                isBlinking: isBlackBlinking,
-                forceLookX: (password.length > 0 && showPassword) ? -3 : isLookingAtEachOther ? 0 : undefined,
-                forceLookY: (password.length > 0 && showPassword) ? -3 : isLookingAtEachOther ? -3 : undefined
-              }),
-              React.createElement(EyeBall, {
-                size: 12,
-                pupilSize: 4,
-                maxDistance: 2,
-                eyeColor: 'white',
-                pupilColor: '#2D2D2D',
-                isBlinking: isBlackBlinking,
-                forceLookX: (password.length > 0 && showPassword) ? -3 : isLookingAtEachOther ? 0 : undefined,
-                forceLookY: (password.length > 0 && showPassword) ? -3 : isLookingAtEachOther ? -3 : undefined
-              })
-            )
-          ),
-
-          // Orange semi-circle character - Front left
-          React.createElement(
-            'div',
-            {
-              ref: orangeRef,
-              style: {
-                position: 'absolute',
-                bottom: '0',
-                left: '0px',
-                width: '170px',
-                height: '130px',
-                backgroundColor: '#FF9B6B',
-                borderRadius: '80px 80px 0 0',
-                zIndex: '3',
-                transform: (password.length > 0 && showPassword) ? 'skewX(0deg)' : `skewX(${orangePos.bodySkew || 0}deg)`,
-                transformOrigin: 'bottom center',
-                transition: 'transform 0.4s ease'
-              }
-            },
-            React.createElement(
-              'div',
-              {
-                style: {
-                  position: 'absolute',
-                  display: 'flex',
-                  gap: '1.5rem',
-                  left: (password.length > 0 && showPassword) ? '32px' : `${55 + orangePos.faceX}px`,
-                  top: (password.length > 0 && showPassword) ? '55px' : `${60 + orangePos.faceY}px`,
-                  transition: 'left 0.4s ease, top 0.4s ease'
-                }
-              },
-              React.createElement(Pupil, { size: 8, maxDistance: 3, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -4 : undefined, forceLookY: (password.length > 0 && showPassword) ? -3 : undefined }),
-              React.createElement(Pupil, { size: 8, maxDistance: 3, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -4 : undefined, forceLookY: (password.length > 0 && showPassword) ? -3 : undefined })
-            )
-          ),
-
-          // Yellow tall rectangle character - Front right
-          React.createElement(
-            'div',
-            {
-              ref: yellowRef,
-              style: {
-                position: 'absolute',
-                bottom: '0',
-                left: '220px',
-                width: '100px',
-                height: '150px',
-                backgroundColor: '#E8D754',
-                borderRadius: '50px 50px 0 0',
-                zIndex: '4',
-                transform: (password.length > 0 && showPassword) ? 'skewX(0deg)' : `skewX(${yellowPos.bodySkew || 0}deg)`,
-                transformOrigin: 'bottom center',
-                transition: 'transform 0.4s ease'
-              }
-            },
-            React.createElement(
-              'div',
-              {
-                style: {
-                  position: 'absolute',
-                  display: 'flex',
-                  gap: '1.2rem',
-                  left: (password.length > 0 && showPassword) ? '12px' : `${35 + yellowPos.faceX}px`,
-                  top: (password.length > 0 && showPassword) ? '25px' : `${30 + yellowPos.faceY}px`,
-                  transition: 'left 0.4s ease, top 0.4s ease'
-                }
-              },
-              React.createElement(Pupil, { size: 8, maxDistance: 3, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -4 : undefined, forceLookY: (password.length > 0 && showPassword) ? -3 : undefined }),
-              React.createElement(Pupil, { size: 8, maxDistance: 3, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -4 : undefined, forceLookY: (password.length > 0 && showPassword) ? -3 : undefined })
-            ),
-            React.createElement('div', {
-              style: {
-                position: 'absolute',
-                width: '50px',
-                height: '4px',
-                backgroundColor: '#2D2D2D',
-                borderRadius: '2px',
-                left: (password.length > 0 && showPassword) ? '10px' : `${25 + yellowPos.faceX}px`,
-                top: (password.length > 0 && showPassword) ? '62px' : `${62 + yellowPos.faceY}px`,
-                transition: 'left 0.4s ease, top 0.4s ease'
-              }
-            })
-          )
-        )
-      ),
-
-      React.createElement(
-        'div',
-        { style: { display: 'flex', gap: '1.2rem', fontSize: '0.75rem', color: 'var(--text-secondary)' } },
-        React.createElement('span', null, 'Privacy Policy'),
-        React.createElement('span', null, 'Terms of Service'),
-        React.createElement('span', null, 'Support Center')
-      )
-    ),
-
-    // RIGHT SECTION: FORM BLOCK
+    // DUAL CARD WRAPPER - SIDE BY SIDE WITH EQUAL HEIGHT STRETCH
     React.createElement(
       'div',
       {
         style: {
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: 'row',
+          alignItems: 'stretch', // ensures left green box and right form card align perfectly at same height
           justifyContent: 'center',
-          padding: '1.5rem',
-          height: '100%',
-          overflow: 'hidden',
+          gap: '2.5rem',
+          width: '100%',
+          maxWidth: '820px',
+          height: '470px', // exact uniform locks to prevent any viewport scrolling
           boxSizing: 'border-box'
         }
       },
+
+      // LEFT COLUMN: ILLUSTRATED GREEN CARD
+      React.createElement(
+        'div',
+        {
+          className: 'hidden lg:flex',
+          style: {
+            flex: '1',
+            background: 'rgba(76, 175, 80, 0.05)',
+            border: '1px solid rgba(76, 175, 80, 0.15)',
+            borderRadius: 'var(--radius-lg)',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            padding: '1.5rem',
+            boxSizing: 'border-box',
+            position: 'relative',
+            overflow: 'hidden',
+            paddingTop: '2rem' // fits container header spacing cleanly
+          }
+        },
+        
+        // Brand logo
+        React.createElement(
+          'div',
+          { style: { zIndex: '10', display: 'flex', alignItems: 'center', gap: '0.4rem' } },
+          React.createElement(Icons.Logo, { size: 28 }),
+          React.createElement('span', { style: { fontWeight: '700', fontSize: '1rem', color: 'var(--primary-color)' } }, 'FoodBridge')
+        ),
+
+        // Animated illustrated characters container
+        React.createElement(
+          'div',
+          {
+            style: {
+              zIndex: '10',
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              height: '240px',
+              position: 'relative',
+              boxSizing: 'border-box',
+              paddingTop: '3.5rem' // pushes Illustrated blob characters downward to sit closer to floor
+            }
+          },
+          React.createElement(
+            'div',
+            { style: { position: 'relative', width: '280px', height: '180px' } },
+            
+            // Purple character
+            React.createElement(
+              'div',
+              {
+                ref: purpleRef,
+                style: {
+                  position: 'absolute',
+                  bottom: '0',
+                  left: '40px',
+                  width: '90px',
+                  height: (isTyping || (password.length > 0 && !showPassword)) ? '210px' : '190px',
+                  backgroundColor: '#6C3FF5',
+                  borderRadius: '8px 8px 0 0',
+                  zIndex: '1',
+                  transform: (password.length > 0 && showPassword)
+                    ? 'skewX(0deg)'
+                    : (isTyping || (password.length > 0 && !showPassword))
+                      ? `skewX(${(purplePos.bodySkew || 0) - 8}deg) translateX(20px)`
+                      : `skewX(${purplePos.bodySkew || 0}deg)`,
+                  transformOrigin: 'bottom center',
+                  transition: 'height 0.4s ease, transform 0.4s ease'
+                }
+              },
+              React.createElement(
+                'div',
+                {
+                  style: {
+                    position: 'absolute',
+                    display: 'flex',
+                    gap: '1.2rem',
+                    left: (password.length > 0 && showPassword) ? '12px' : isLookingAtEachOther ? '25px' : `${20 + purplePos.faceX}px`,
+                    top: (password.length > 0 && showPassword) ? '15px' : isLookingAtEachOther ? '35px' : `${22 + purplePos.faceY}px`,
+                    transition: 'left 0.4s ease, top 0.4s ease'
+                  }
+                },
+                React.createElement(EyeBall, {
+                  size: 10,
+                  pupilSize: 3.5,
+                  maxDistance: 2,
+                  eyeColor: 'white',
+                  pupilColor: '#2D2D2D',
+                  isBlinking: isPurpleBlinking,
+                  forceLookX: (password.length > 0 && showPassword) ? (isPurplePeeking ? 2.5 : -2.5) : isLookingAtEachOther ? 2 : undefined,
+                  forceLookY: (password.length > 0 && showPassword) ? (isPurplePeeking ? 3 : -2.5) : isLookingAtEachOther ? 2.5 : undefined
+                }),
+                React.createElement(EyeBall, {
+                  size: 10,
+                  pupilSize: 3.5,
+                  maxDistance: 2,
+                  eyeColor: 'white',
+                  pupilColor: '#2D2D2D',
+                  isBlinking: isPurpleBlinking,
+                  forceLookX: (password.length > 0 && showPassword) ? (isPurplePeeking ? 2.5 : -2.5) : isLookingAtEachOther ? 2 : undefined,
+                  forceLookY: (password.length > 0 && showPassword) ? (isPurplePeeking ? 3 : -2.5) : isLookingAtEachOther ? 2.5 : undefined
+                })
+              )
+            ),
+
+            // Black character
+            React.createElement(
+              'div',
+              {
+                ref: blackRef,
+                style: {
+                  position: 'absolute',
+                  bottom: '0',
+                  left: '145px',
+                  width: '65px',
+                  height: '150px',
+                  backgroundColor: '#2D2D2D',
+                  borderRadius: '6px 6px 0 0',
+                  zIndex: '2',
+                  transform: (password.length > 0 && showPassword)
+                    ? 'skewX(0deg)'
+                    : isLookingAtEachOther
+                      ? `skewX(${(blackPos.bodySkew || 0) * 1.5 + 4}deg) translateX(8px)`
+                      : (isTyping || (password.length > 0 && !showPassword))
+                        ? `skewX(${(blackPos.bodySkew || 0) * 1.5}deg)`
+                        : `skewX(${blackPos.bodySkew || 0}deg)`,
+                  transformOrigin: 'bottom center',
+                  transition: 'transform 0.4s ease'
+                }
+              },
+              React.createElement(
+                'div',
+                {
+                  style: {
+                    position: 'absolute',
+                    display: 'flex',
+                    gap: '0.8rem',
+                    left: (password.length > 0 && showPassword) ? '6px' : isLookingAtEachOther ? '16px' : `${10 + blackPos.faceX}px`,
+                    top: (password.length > 0 && showPassword) ? '12px' : isLookingAtEachOther ? '6px' : `${15 + blackPos.faceY}px`,
+                    transition: 'left 0.4s ease, top 0.4s ease'
+                  }
+                },
+                React.createElement(EyeBall, {
+                  size: 9,
+                  pupilSize: 3,
+                  maxDistance: 1.5,
+                  eyeColor: 'white',
+                  pupilColor: '#2D2D2D',
+                  isBlinking: isBlackBlinking,
+                  forceLookX: (password.length > 0 && showPassword) ? -2.5 : isLookingAtEachOther ? 0 : undefined,
+                  forceLookY: (password.length > 0 && showPassword) ? -2.5 : isLookingAtEachOther ? -2.5 : undefined
+                }),
+                React.createElement(EyeBall, {
+                  size: 9,
+                  pupilSize: 3,
+                  maxDistance: 1.5,
+                  eyeColor: 'white',
+                  pupilColor: '#2D2D2D',
+                  isBlinking: isBlackBlinking,
+                  forceLookX: (password.length > 0 && showPassword) ? -2.5 : isLookingAtEachOther ? 0 : undefined,
+                  forceLookY: (password.length > 0 && showPassword) ? -2.5 : isLookingAtEachOther ? -2.5 : undefined
+                })
+              )
+            ),
+
+            // Orange character
+            React.createElement(
+              'div',
+              {
+                ref: orangeRef,
+                style: {
+                  position: 'absolute',
+                  bottom: '0',
+                  left: '0px',
+                  width: '120px',
+                  height: '90px',
+                  backgroundColor: '#FF9B6B',
+                  borderRadius: '60px 60px 0 0',
+                  zIndex: '3',
+                  transform: (password.length > 0 && showPassword) ? 'skewX(0deg)' : `skewX(${orangePos.bodySkew || 0}deg)`,
+                  transformOrigin: 'bottom center',
+                  transition: 'transform 0.4s ease'
+                }
+              },
+              React.createElement(
+                'div',
+                {
+                  style: {
+                    position: 'absolute',
+                    display: 'flex',
+                    gap: '1rem',
+                    left: (password.length > 0 && showPassword) ? '22px' : `${40 + orangePos.faceX}px`,
+                    top: (password.length > 0 && showPassword) ? '35px' : `${40 + orangePos.faceY}px`,
+                    transition: 'left 0.4s ease, top 0.4s ease'
+                  }
+                },
+                React.createElement(Pupil, { size: 6, maxDistance: 2, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -3 : undefined, forceLookY: (password.length > 0 && showPassword) ? -2 : undefined }),
+                React.createElement(Pupil, { size: 6, maxDistance: 2, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -3 : undefined, forceLookY: (password.length > 0 && showPassword) ? -2 : undefined })
+              )
+            ),
+
+            // Yellow character
+            React.createElement(
+              'div',
+              {
+                ref: yellowRef,
+                style: {
+                  position: 'absolute',
+                  bottom: '0',
+                  left: '185px',
+                  width: '75px',
+                  height: '110px',
+                  backgroundColor: '#E8D754',
+                  borderRadius: '35px 35px 0 0',
+                  zIndex: '4',
+                  transform: (password.length > 0 && showPassword) ? 'skewX(0deg)' : `skewX(${yellowPos.bodySkew || 0}deg)`,
+                  transformOrigin: 'bottom center',
+                  transition: 'transform 0.4s ease'
+                }
+              },
+              React.createElement(
+                'div',
+                {
+                  style: {
+                    position: 'absolute',
+                    display: 'flex',
+                    gap: '0.8rem',
+                    left: (password.length > 0 && showPassword) ? '8px' : `${20 + yellowPos.faceX}px`,
+                    top: (password.length > 0 && showPassword) ? '18px' : `${20 + yellowPos.faceY}px`,
+                    transition: 'left 0.4s ease, top 0.4s ease'
+                  }
+                },
+                React.createElement(Pupil, { size: 6, maxDistance: 2, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -3 : undefined, forceLookY: (password.length > 0 && showPassword) ? -2 : undefined }),
+                React.createElement(Pupil, { size: 6, maxDistance: 2, pupilColor: '#2D2D2D', forceLookX: (password.length > 0 && showPassword) ? -3 : undefined, forceLookY: (password.length > 0 && showPassword) ? -2 : undefined })
+              ),
+              React.createElement('div', {
+                style: {
+                  position: 'absolute',
+                  width: '35px',
+                  height: '3px',
+                  backgroundColor: '#2D2D2D',
+                  borderRadius: '2px',
+                  left: (password.length > 0 && showPassword) ? '8px' : `${18 + yellowPos.faceX}px`,
+                  top: (password.length > 0 && showPassword) ? '40px' : `${40 + yellowPos.faceY}px`,
+                  transition: 'left 0.4s ease, top 0.4s ease'
+                }
+              })
+            )
+          )
+        ),
+
+        // Small footer text links
+        React.createElement(
+          'div',
+          { style: { display: 'flex', gap: '0.8rem', fontSize: '0.7rem', color: 'var(--text-secondary)', justifyContent: 'center' } },
+          React.createElement('span', null, 'Privacy Policy'),
+          React.createElement('span', null, 'Terms of Service'),
+          React.createElement('span', null, 'Support Center')
+        )
+      ),
+
+      // RIGHT COLUMN: WHITE FORM CARD
       React.createElement(
         'div',
         {
           className: 'auth-card glass-panel hover-lift mask-reveal',
           style: {
-            width: '100%',
+            flex: '1',
             maxWidth: '380px',
             padding: '1.5rem',
             borderRadius: 'var(--radius-lg)',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            background: 'var(--glass-bg)',
+            border: '1px solid var(--border-color)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '100%' // stretches to full height of parent wrapper exactly
           }
         },
         React.createElement(
