@@ -67,7 +67,7 @@ export const usePosts = (locationFilter?: { lat?: number; lng?: number }) => {
     setLoading(true);
     setError(null);
     try {
-      const deletedPost = await apiService.deletePost(postId, reason);
+      await apiService.deletePost(postId, reason);
       setPosts((prev) =>
         prev.map((post) => (post.id === postId ? { ...post, status: 'deleted' as const, deleteReason: reason } : post))
       );
