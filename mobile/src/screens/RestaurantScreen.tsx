@@ -10,7 +10,10 @@ import {
   RefreshControl,
   Modal,
   Alert,
+  Linking,
+  Platform,
 } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
 import { useAuth } from '../hooks/useAuth';
 import { usePosts } from '../hooks/usePosts';
 import { formatDate, formatSurplus, formatPortions } from '../utils/format';
@@ -31,6 +34,14 @@ export default function RestaurantScreen() {
   const [venueType, setVenueType] = useState<'cafe' | 'restaurant' | 'fastfood'>('restaurant');
   const [seatingCapacity, setSeatingCapacity] = useState('30');
 
+  // AI Prediction state
+  const [aiRecommendation, setAiRecommendation] = useState<string | null>(null);
+  const [predicting, setPredicting] = useState(false);
+
+  // CSV Upload state
+  const [csvFile, setCsvFile] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
   // Delete modal state
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
   const [deleteReason, setDeleteReason] = useState('Food no longer available');
@@ -45,8 +56,54 @@ export default function RestaurantScreen() {
   const handleSubmit = () => {
     const p = parseInt(portions) || 0;
     const sc = parseInt(seatingCapacity) || 0;
-    if (p <= 0 || sc <= 0) return;
+    if (p <= 0 || sc <= 0) {
+      Alert.alert('Invalid', 'Please enter valid portions and seating capacity.');
+      return;
+    }
     createPost({ portions: p, mealTime, venueType, seatingCapacity: sc });
+    setAiRecommendation(null);
+  };
+
+  const handlePredict = async () => {
+    const p = parseInt(portions) || 0;
+    const sc = parseInt(seatingCapacity) || 0;
+    if (p <= 0 || sc <= 0) {
+      Alert.alert('Invalid', 'Please enter valid portions and seating capacity.');
+      return;
+    }
+    setPredicting(true);
+    setAiRecommendation(null);
+    try {
+      // Mock AI prediction
+      await new Promise((r) => setTimeout(r, 1200));
+      const surplusPortions = Math.max(1, Math.round(p * 0.6));
+      const surplusKg = surplusPortions * 0.35;
+      const feedMin = Math.max(1, Math.floor(surplusPortions * 0.5));
+      const feedMax = Math.max(2, Math.ceil(surplusPortions * 0.6));
+      setAiRecommendation(
+        `Based on your sales history, you'll have ${surplusPortions} surplus portions tonight. That's ${surplusKg.toFixed(1)}kg of food that can feed ${feedMin}-${feedMax} people. Post it on FoodBridge.`
+      );
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'Prediction failed');
+    } finally {
+      setPredicting(false);
+    }
+  };
+
+  const handlePickCSV = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({ type: 'text/csv' });
+      if (!result.canceled && result.assets?.[0]) {
+        setCsvFile(result.assets[0].name);
+        setUploading(true);
+        // Mock upload + training
+        await new Promise((r) => setTimeout(r, 2000));
+        setUploading(false);
+        Alert.alert('Training Complete', 'AI model trained successfully on your sales data!');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Could not pick file');
+    }
   };
 
   const handleDelete = async () => {
@@ -154,6 +211,15 @@ export default function RestaurantScreen() {
             placeholderTextColor={Colors.textLight}
           />
 
+          {/* AI Recommendation Card */}
+          {aiRecommendation && (
+            <View style={s.aiCard}>
+              <Text style={s.aiCardTitle}>🌿 AI Surplus Suggestion</Text>
+              <Text style={s.aiCardText}>{aiRecommendation}</Text>
+            </View>
+          )}
+
+          {/* Two Buttons: Post + Predict */}
           <TouchableOpacity
             style={[s.submitBtn, loading && { opacity: 0.6 }]}
             onPress={handleSubmit}
@@ -163,7 +229,83 @@ export default function RestaurantScreen() {
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={s.submitText}>📤 Post with AI Prediction</Text>
+              <Text style={s.submitText}>＋ Post Surplus Food</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[s.predictBtn, (predicting || loading) && { opacity: 0.6 }]}
+            onPress={handlePredict}
+            disabled={predicting || loading}
+            activeOpacity={0.8}
+          >
+            {predicting ? (
+              <ActivityIndicator color={Colors.primary} />
+            ) : (
+              <Text style={s.predictBtnText}>🌿 Predict with AI</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* ── AI Sales Training Data (matches web SalesUpload) ── */}
+        <View style={s.salesCard}>
+          <View style={s.salesHeader}>
+            <View style={s.salesIconBox}>
+              <Text style={{ fontSize: 18 }}>🗄️</Text>
+            </View>
+            <Text style={s.salesTitle}>AI Sales Training Data</Text>
+          </View>
+
+          <View style={s.salesCallout}>
+            <Text style={s.salesCalloutText}>
+              To improve AI surplus predictions, upload your historical POS sales data. Make sure it contains these columns:
+            </Text>
+          </View>
+
+          <View style={s.codeBlock}>
+            <View style={s.codeLabel}>
+              <Text style={s.codeLabelText}>EXAMPLE.CSV</Text>
+            </View>
+            <Text style={s.codeText}>
+              <Text style={{ color: '#ff9e64' }}>date</Text>,
+              <Text style={{ color: '#ff9e64' }}>day_of_week</Text>,
+              <Text style={{ color: '#ff9e64' }}>meal_period</Text>,
+              <Text style={{ color: '#ff9e64' }}>portions_sold</Text>,
+              <Text style={{ color: '#ff9e64' }}>prepared_quantity</Text>
+              {`\n`}
+              <Text style={{ color: '#9ece6a' }}>2026-05-17</Text>,
+              <Text style={{ color: '#bb9af7' }}>saturday</Text>,
+              <Text style={{ color: '#bb9af7' }}>dinner</Text>,
+              <Text style={{ color: '#7dcfff' }}>92</Text>,
+              <Text style={{ color: '#7dcfff' }}>110</Text>
+              {`\n`}
+              <Text style={{ color: '#9ece6a' }}>2026-05-18</Text>,
+              <Text style={{ color: '#bb9af7' }}>sunday</Text>,
+              <Text style={{ color: '#bb9af7' }}>dinner</Text>,
+              <Text style={{ color: '#7dcfff' }}>85</Text>,
+              <Text style={{ color: '#7dcfff' }}>100</Text>
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={s.uploadZone}
+            onPress={handlePickCSV}
+            disabled={uploading}
+            activeOpacity={0.7}
+          >
+            {uploading ? (
+              <>
+                <ActivityIndicator color={Colors.primary} size="large" />
+                <Text style={s.uploadZoneTitle}>Training AI Model...</Text>
+              </>
+            ) : (
+              <>
+                <View style={s.uploadIconCircle}>
+                  <Text style={{ fontSize: 24 }}>📤</Text>
+                </View>
+                <Text style={s.uploadZoneTitle}>{csvFile || 'Tap to select CSV'}</Text>
+                <Text style={s.uploadZoneSub}>{csvFile ? `Selected` : 'Select from your files'}</Text>
+              </>
             )}
           </TouchableOpacity>
         </View>
@@ -442,6 +584,170 @@ const s = StyleSheet.create({
     ...Shadow.md,
   },
   submitText: { color: '#FFF', fontSize: FontSize.md, fontWeight: FontWeight.bold },
+  predictBtn: {
+    borderRadius: Radius.sm,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    backgroundColor: 'transparent',
+    marginTop: Spacing.sm,
+  },
+  predictBtnText: { color: Colors.primary, fontSize: FontSize.md, fontWeight: FontWeight.bold },
+  aiCard: {
+    backgroundColor: 'rgba(76, 175, 80, 0.06)',
+    borderRadius: Radius.sm,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(76, 175, 80, 0.2)',
+    marginBottom: Spacing.lg,
+  },
+  aiCardTitle: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, color: Colors.primary, marginBottom: 4 },
+  aiCardText: { fontSize: FontSize.sm, color: Colors.textSecondary, lineHeight: 20 },
+
+  // ── Sales Training Data ──
+  salesCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    padding: Spacing.xl,
+    marginBottom: Spacing.xl,
+    ...Shadow.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  salesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: Spacing.lg,
+  },
+  salesIconBox: {
+    padding: 8,
+    backgroundColor: Colors.primaryGlow,
+    borderRadius: Radius.sm,
+  },
+  salesTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+  },
+  salesCallout: {
+    backgroundColor: 'rgba(255, 152, 0, 0.05)',
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.secondary,
+    padding: Spacing.md,
+    borderTopRightRadius: Radius.sm,
+    borderBottomRightRadius: Radius.sm,
+    marginBottom: Spacing.md,
+  },
+  salesCalloutText: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+  },
+  codeBlock: {
+    backgroundColor: '#1a1b26',
+    borderRadius: Radius.md,
+    padding: Spacing.md,
+    paddingTop: Spacing.xl,
+    marginBottom: Spacing.lg,
+    position: 'relative',
+  },
+  codeLabel: {
+    position: 'absolute',
+    top: -10,
+    left: 12,
+    backgroundColor: Colors.surface,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+  },
+  codeLabelText: {
+    fontSize: 9,
+    fontWeight: FontWeight.bold,
+    color: Colors.textLight,
+    letterSpacing: 0.5,
+  },
+  codeText: {
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 11,
+    lineHeight: 18,
+    color: '#a9b1d6',
+  },
+  uploadZone: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: Colors.borderLight,
+    borderRadius: Radius.md,
+    padding: Spacing.xl,
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.background,
+  },
+  uploadIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Shadow.sm,
+  },
+  uploadZoneTitle: {
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.textPrimary,
+  },
+  uploadZoneSub: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+  },
+
+  // ── Map ──
+  mapCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    padding: Spacing.xl,
+    marginBottom: Spacing.xl,
+    ...Shadow.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  mapPlaceholder: {
+    alignItems: 'center',
+    padding: Spacing.xl,
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+  },
+  mapPlaceholderTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    marginBottom: 4,
+  },
+  mapPlaceholderSub: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: Spacing.md,
+  },
+  mapOpenBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: Radius.sm,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    ...Shadow.sm,
+  },
+  mapOpenBtnText: {
+    color: '#FFF',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+  },
 
   // ── Posts List ──
   sectionTitle: {
