@@ -24,10 +24,11 @@ export const formatPortions = (portions: number): string => {
 };
 
 /**
- * Formats predicted food waste in kilograms.
+ * Formats predicted food surplus in kilograms.
  */
-export const formatWaste = (kg: number): string => {
-  return `${kg.toFixed(1)} kg`;
+export const formatSurplus = (kg?: number): string => {
+  const val = kg !== undefined && kg !== null ? kg : 0;
+  return `${val.toFixed(1)} kg`;
 };
 
 /**

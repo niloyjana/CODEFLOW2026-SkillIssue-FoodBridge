@@ -84,9 +84,9 @@ export const AvailablePosts: React.FC = () => {
                   { className: 'meta-item' },
                   React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
                     React.createElement(Icons.Leaf, { size: 12, color: 'var(--primary-color)' }),
-                    'Est. Waste Saved'
+                    'Est. Surplus Saved'
                   ),
-                  React.createElement('span', { className: 'meta-value', style: { color: 'var(--primary-color)', fontWeight: '600' } }, `${post.predictedWasteKg} kg`)
+                  React.createElement('span', { className: 'meta-value', style: { color: 'var(--primary-color)', fontWeight: '600' } }, `${post.predictedSurplusKg} kg`)
                 )
               ),
               React.createElement(

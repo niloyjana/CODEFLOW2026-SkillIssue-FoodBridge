@@ -6,11 +6,16 @@ import IndividualDashboard from '../components/individual/IndividualDashboard';
 
 export const IndividualPage: React.FC = () => {
   const { user } = useAuth();
-  const { posts, createPost, loading } = usePosts();
+  // Pass user location so usePosts fetches only nearby posts within 20 km
+  const { posts, createPost, deletePost, loading } = usePosts(
+    user?.lat !== undefined && user?.lng !== undefined
+      ? { lat: user.lat, lng: user.lng }
+      : undefined
+  );
 
-  const myPosts = posts.filter(p => p.restaurantId === user?.id);
+  const myPosts = posts.filter(p => p.restaurantId === user?.id && p.status !== 'deleted');
   const activeCount = myPosts.filter(p => p.status === 'active').length;
-  const totalWasteSaved = myPosts.reduce((acc, p) => acc + p.predictedWasteKg, 0);
+  const totalSurplusSaved = myPosts.reduce((acc, p) => acc + (p.predictedSurplusKg || 0), 0);
 
   return React.createElement(
     'div',
@@ -57,8 +62,8 @@ export const IndividualPage: React.FC = () => {
         React.createElement(
           'div',
           { style: { textAlign: 'center', minWidth: '95px', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(76,175,80,0.1)' } },
-          React.createElement('span', { style: { fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem', fontWeight: 600 } }, 'Waste Saved'),
-          React.createElement('span', { style: { fontSize: '1.35rem', fontWeight: '800', color: 'var(--primary-color)' } }, `${totalWasteSaved.toFixed(1)} kg`)
+          React.createElement('span', { style: { fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem', fontWeight: 600 } }, 'Surplus Saved'),
+          React.createElement('span', { style: { fontSize: '1.35rem', fontWeight: '800', color: 'var(--primary-color)' } }, `${totalSurplusSaved.toFixed(1)} kg`)
         )
       )
     ),
@@ -66,8 +71,8 @@ export const IndividualPage: React.FC = () => {
     React.createElement(
       'div',
       { className: 'dashboard-grid mask-reveal delay-2' },
-      React.createElement(PostForm, { onCreatePost: createPost, loading: loading }),
-      React.createElement(IndividualDashboard, null)
+      React.createElement(PostForm, { onCreatePost: createPost, loading: loading, restaurantId: user?.id || '' }),
+      React.createElement(IndividualDashboard, { posts: posts, loading: loading, onDeletePost: deletePost })
     )
   );
 };

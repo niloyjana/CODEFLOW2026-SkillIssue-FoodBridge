@@ -34,7 +34,7 @@ export const MOCK_POSTS: FoodPost[] = [
     restaurantId: 'rest_1',
     restaurantName: 'Pizza Palace',
     portions: 25,
-    predictedWasteKg: 5.4,
+    predictedSurplusKg: 5.4,
     status: 'active',
     createdAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
     pickupBy: new Date(Date.now() + 7200000).toISOString(), // in 2 hours
@@ -47,7 +47,7 @@ export const MOCK_POSTS: FoodPost[] = [
     restaurantId: 'rest_2',
     restaurantName: 'Green Cafe',
     portions: 12,
-    predictedWasteKg: 2.1,
+    predictedSurplusKg: 2.1,
     status: 'active',
     createdAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
     pickupBy: new Date(Date.now() + 3600000).toISOString(), // in 1 hour
@@ -60,7 +60,7 @@ export const MOCK_POSTS: FoodPost[] = [
     restaurantId: 'rest_3',
     restaurantName: 'Burger Junction',
     portions: 40,
-    predictedWasteKg: 8.5,
+    predictedSurplusKg: 8.5,
     status: 'claimed',
     createdAt: new Date(Date.now() - 10800000).toISOString(), // 3 hours ago
     pickupBy: new Date(Date.now() + 1800000).toISOString(), // in 30 mins
@@ -75,7 +75,7 @@ export const MOCK_POSTS: FoodPost[] = [
     restaurantId: 'rest_2',
     restaurantName: 'Green Cafe',
     portions: 50,
-    predictedWasteKg: 10.2,
+    predictedSurplusKg: 10.2,
     status: 'active',
     createdAt: new Date(Date.now() - 1800000).toISOString(), // 30 mins ago
     pickupBy: new Date(Date.now() + 14400000).toISOString(), // in 4 hours

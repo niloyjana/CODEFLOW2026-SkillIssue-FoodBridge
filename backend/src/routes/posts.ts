@@ -48,7 +48,19 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =>
     }
 
     const snapshot = await query.get();
-    let posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let posts = snapshot.docs.map(doc => {
+      const data = doc.data() as any;
+      return {
+        id: doc.id,
+        ...data,
+        predictedSurplusKg: data.predictedSurplusKg !== undefined ? data.predictedSurplusKg : data.predictedWasteKg || 0
+      };
+    });
+
+    // Filter out deleted posts unless status is explicitly queried as 'deleted'
+    if (status !== 'deleted') {
+      posts = posts.filter((p: any) => p.status !== 'deleted');
+    }
 
     if (lat && lng && radius) {
       const latitude = parseFloat(lat as string);
@@ -73,7 +85,7 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =>
 // Protected by requireAuth
 router.post('/', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { portions, mealTime, venueType, seatingCapacity, currentUser } = req.body;
+    const { portions, mealTime, venueType, seatingCapacity, currentUser, useAi } = req.body;
     const firebaseUser = req.user;
 
     if (portions === undefined || !mealTime || !venueType || seatingCapacity === undefined || !currentUser) {
@@ -87,34 +99,37 @@ router.post('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =
       return;
     }
 
-    // Call local AI service for waste prediction
-    let predictedWasteKg = 0;
-    try {
-      const aiResponse = await fetch('http://127.0.0.1:5001/predict', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          portions,
-          seatingCapacity,
-          mealTime,
-          venueType
-        })
-      });
-      
-      if (aiResponse.ok) {
-        const aiData = await aiResponse.json();
-        predictedWasteKg = aiData.predictedWasteKg || 0;
-      } else {
-        console.error('AI service returned error:', await aiResponse.text());
+    // Call local AI service for surplus prediction if requested
+    let predictedSurplusKg = 0;
+    if (useAi) {
+      try {
+        const aiResponse = await fetch('http://127.0.0.1:5001/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            portions,
+            seatingCapacity,
+            mealTime,
+            venueType,
+            restaurantId: currentUser.id
+          })
+        });
+        
+        if (aiResponse.ok) {
+          const aiData = (await aiResponse.json()) as any;
+          predictedSurplusKg = aiData.predictedSurplusKg || 0;
+        } else {
+          console.error('AI service returned error:', await aiResponse.text());
+          // Fallback formula if AI is down
+          predictedSurplusKg = Math.max(0.5, portions * 0.18); 
+        }
+      } catch (aiErr) {
+        console.error('Failed to connect to AI service:', aiErr);
         // Fallback formula if AI is down
-        predictedWasteKg = Math.max(0.5, portions * 0.18); 
+        predictedSurplusKg = Math.max(0.5, portions * 0.18); 
       }
-    } catch (aiErr) {
-      console.error('Failed to connect to AI service:', aiErr);
-      // Fallback formula if AI is down
-      predictedWasteKg = Math.max(0.5, portions * 0.18); 
     }
 
     const pickupTime = new Date();
@@ -127,7 +142,7 @@ router.post('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =
       restaurantId: currentUser.id,
       restaurantName: currentUser.name,
       portions,
-      predictedWasteKg,
+      predictedSurplusKg,
       status: 'active',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       pickupBy: admin.firestore.Timestamp.fromDate(pickupTime),
@@ -148,7 +163,7 @@ router.post('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =
       transaction.set(postRef, newPost);
       transaction.update(userRef, {
         points: admin.firestore.FieldValue.increment(10),
-        totalKgSaved: admin.firestore.FieldValue.increment(predictedWasteKg),
+        totalKgSaved: admin.firestore.FieldValue.increment(predictedSurplusKg),
       });
     });
 
@@ -318,6 +333,76 @@ router.post('/:postId/complete', requireAuth, async (req: AuthenticatedRequest, 
   } catch (err: any) {
     console.error('Error in POST /posts/:postId/complete:', err.message || err);
     res.status(500).json({ error: err.message || 'Failed to complete post' });
+  }
+});
+
+// POST /api/posts/:postId/delete
+// Protected by requireAuth
+router.post('/:postId/delete', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { postId } = req.params;
+    const { reason } = req.body;
+    const firebaseUser = req.user;
+
+    if (!reason) {
+      res.status(400).json({ error: 'Delete reason is required' });
+      return;
+    }
+
+    const postRef = db.collection('posts').doc(postId);
+
+    const updatedPost = await db.runTransaction(async (transaction) => {
+      const postSnapshot = await transaction.get(postRef);
+      if (!postSnapshot.exists) {
+        throw new Error('Post not found');
+      }
+
+      const postData = postSnapshot.data();
+      if (!postData) {
+        throw new Error('Post data is empty');
+      }
+
+      if (postData.restaurantId !== firebaseUser.uid) {
+        throw new Error('Forbidden: Only the restaurant that created this post can delete it');
+      }
+
+      if (postData.status === 'deleted') {
+        throw new Error('Post is already deleted');
+      }
+
+      if (postData.status !== 'active') {
+        throw new Error('Only active posts can be deleted');
+      }
+
+      const userRef = db.collection('users').doc(postData.restaurantId);
+      const userSnapshot = await transaction.get(userRef);
+
+      transaction.update(postRef, {
+        status: 'deleted',
+        deleteReason: reason,
+        deletedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      if (userSnapshot.exists) {
+        const predictedSurplusKg = postData.predictedSurplusKg || 0;
+        transaction.update(userRef, {
+          points: admin.firestore.FieldValue.increment(-10),
+          totalKgSaved: admin.firestore.FieldValue.increment(-predictedSurplusKg),
+        });
+      }
+
+      return {
+        ...postData,
+        id: postId,
+        status: 'deleted',
+        deleteReason: reason
+      };
+    });
+
+    res.status(200).json(serializeData(updatedPost));
+  } catch (err: any) {
+    console.error('Error in POST /posts/:postId/delete:', err.message || err);
+    res.status(500).json({ error: err.message || 'Failed to delete post' });
   }
 });
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 import { usePosts } from '../hooks/usePosts';
-import { formatDate, formatWaste } from '../utils/format';
+import { formatDate, formatSurplus } from '../utils/format';
 import { Colors, Spacing, Radius, FontSize, FontWeight, Shadow } from '../theme';
 
 export default function IndividualScreen() {
@@ -16,7 +16,7 @@ export default function IndividualScreen() {
   const myPosts = posts.filter(p => p.restaurantId === user?.id);
   const availablePosts = posts.filter(p => p.status === 'active' && p.restaurantId !== user?.id);
   const activeCount = myPosts.filter(p => p.status === 'active').length;
-  const totalWaste = myPosts.reduce((a, p) => a + p.predictedWasteKg, 0);
+  const totalSurplus = myPosts.reduce((a, p) => a + (p.predictedSurplusKg || 0), 0);
 
   const meals: ('breakfast'|'lunch'|'dinner')[] = ['breakfast', 'lunch', 'dinner'];
   const venues: ('cafe'|'restaurant'|'fastfood')[] = ['cafe', 'restaurant', 'fastfood'];
@@ -43,7 +43,7 @@ export default function IndividualScreen() {
         <Text style={s.welcome}>Welcome, {user?.name || 'Volunteer'}! ❤️</Text>
         <Text style={s.headerSub}>Post donations, earn badges, and track impact.</Text>
         <View style={s.statsRow}>
-          {[{ v: activeCount, l: 'Posts', c: Colors.primary }, { v: `${user?.points || 0} pts`, l: 'Points', c: Colors.secondary }, { v: `${totalWaste.toFixed(1)} kg`, l: 'Saved', c: Colors.primary }].map((st, i) => (
+          {[{ v: activeCount, l: 'Posts', c: Colors.primary }, { v: `${user?.points || 0} pts`, l: 'Points', c: Colors.secondary }, { v: `${totalSurplus.toFixed(1)} kg`, l: 'Saved', c: Colors.primary }].map((st, i) => (
             <View key={i} style={s.statBox}><Text style={[s.statVal, { color: st.c }]}>{st.v}</Text><Text style={s.statLbl}>{st.l}</Text></View>
           ))}
         </View>
@@ -108,7 +108,7 @@ export default function IndividualScreen() {
           <View style={s.postHeader}><Text style={s.postPortions}>{post.portions} portions</Text>
             <View style={[s.statusBadge, post.status === 'active' ? s.badgeActiveColor : s.badgeClaimedColor]}><Text style={s.badgeSmText}>{post.status.toUpperCase()}</Text></View>
           </View>
-          <View style={s.wasteRow}><Text style={s.wasteLabel}>🌿 AI Waste:</Text><Text style={s.wasteVal}>{formatWaste(post.predictedWasteKg)}</Text></View>
+          <View style={s.wasteRow}><Text style={s.wasteLabel}>🌿 AI Surplus Saved:</Text><Text style={s.wasteVal}>{formatSurplus(post.predictedSurplusKg)}</Text></View>
           {post.status === 'claimed' && <Text style={s.claimedNote}>✅ Claimed by {post.claimedByName || 'a shelter'}</Text>}
         </View>
       ))}

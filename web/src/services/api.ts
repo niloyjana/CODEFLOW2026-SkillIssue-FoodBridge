@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { FoodPost, LeaderboardEntry, User, UserType, AppNotification } from 'shared/types';
-import { ENDPOINTS } from 'shared/constants/endpoints';
+import { ENDPOINTS, AI_BASE_URL } from 'shared/constants/endpoints';
 import { auth as firebaseAuth } from '../config/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 
@@ -131,6 +131,22 @@ export const apiService = {
     if (params?.userId) {
       result = result.filter(p => p.claimedBy === params.userId);
     }
+    // Client-side Haversine distance filter (mirrors backend behaviour)
+    if (params?.lat !== undefined && params?.lng !== undefined && params?.radius !== undefined) {
+      const { lat, lng, radius } = params;
+      const R = 6371;
+      result = result.filter(p => {
+        if (p.lat === undefined || p.lng === undefined) return false;
+        const dLat = (p.lat - lat) * (Math.PI / 180);
+        const dLng = (p.lng - lng) * (Math.PI / 180);
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat * (Math.PI / 180)) * Math.cos(p.lat * (Math.PI / 180)) *
+          Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return dist <= radius;
+      });
+    }
     return result;
   },
 
@@ -140,6 +156,7 @@ export const apiService = {
     venueType: 'cafe' | 'restaurant' | 'fastfood';
     seatingCapacity: number;
     currentUser: User;
+    useAi: boolean;
   }): Promise<FoodPost> => {
     if (!MOCK_MODE) {
       const headers = await getAuthHeaders();
@@ -152,7 +169,7 @@ export const apiService = {
       restaurantId: postData.currentUser.id,
       restaurantName: postData.currentUser.name,
       portions: postData.portions,
-      predictedWasteKg: parseFloat((postData.portions * 0.22).toFixed(1)),
+      predictedSurplusKg: postData.useAi ? parseFloat((postData.portions * 0.22).toFixed(1)) : 0,
       status: 'active',
       createdAt: new Date().toISOString(),
       pickupBy: new Date(Date.now() + 7200000).toISOString(),
@@ -163,6 +180,40 @@ export const apiService = {
     
     mockPostsInMemory.unshift(newPost);
     return newPost;
+  },
+
+  predictSurplus: async (postData: {
+    portions: number;
+    mealTime: 'breakfast' | 'lunch' | 'dinner';
+    venueType: 'cafe' | 'restaurant' | 'fastfood';
+    seatingCapacity: number;
+    restaurantId: string;
+  }): Promise<{ predictedSurplusKg: number; features?: any }> => {
+    if (MOCK_MODE) {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      return { predictedSurplusKg: parseFloat((postData.portions * 0.22).toFixed(1)) };
+    }
+    const response = await axios.post(`${AI_BASE_URL}/predict`, postData);
+    return response.data;
+  },
+
+  deletePost: async (postId: string, reason: string): Promise<FoodPost> => {
+    if (!MOCK_MODE) {
+      const headers = await getAuthHeaders();
+      const response = await axios.post(`${ENDPOINTS.posts}/${postId}/delete`, { reason }, { headers });
+      return response.data;
+    }
+
+    const postIdx = mockPostsInMemory.findIndex(p => p.id === postId);
+    if (postIdx === -1) throw new Error('Post not found');
+    const post = mockPostsInMemory[postIdx];
+    const updated = {
+      ...post,
+      status: 'deleted' as const,
+      deleteReason: reason,
+    };
+    mockPostsInMemory[postIdx] = updated;
+    return updated;
   },
 
   claimPost: async (postId: string, currentUser: User): Promise<FoodPost> => {
@@ -245,6 +296,29 @@ export const apiService = {
     };
     mockPostsInMemory[postIdx] = updated;
     return updated;
+  },
+
+  uploadSalesData: async (formData: FormData): Promise<{ success: boolean; rows: number; filepath: string }> => {
+    if (MOCK_MODE) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return { success: true, rows: 150, filepath: 'mock_filepath.csv' };
+    }
+    const response = await axios.post(`${AI_BASE_URL}/upload-sales`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  trainModel: async (restaurantId: string): Promise<{ success: boolean; accuracy: number; message: string }> => {
+    if (MOCK_MODE) {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const mockAccuracy = parseFloat((80 + Math.random() * 18).toFixed(1));
+      return { success: true, accuracy: mockAccuracy, message: 'Model trained successfully (MOCK)' };
+    }
+    const response = await axios.post(`${AI_BASE_URL}/train-model`, { restaurantId });
+    return response.data;
   },
 
   // Leaderboard

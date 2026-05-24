@@ -1,0 +1,16 @@
+{
+  "pythonVersion": "3.12",
+  "pythonPlatform": "Windows",
+  "pythonPath": "C:/Users/ANUVAB/AppData/Local/Programs/Python/Python312/python.exe",
+  "venvPath": "C:/Users/ANUVAB/AppData/Local/Programs/Python/Python312",
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "models",
+    "uploads",
+    "**/__pycache__"
+  ],
+  "reportMissingImports": "warning",
+  "reportMissingModuleSource": "none"
+}

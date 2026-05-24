@@ -55,7 +55,7 @@ export default function ShelterScreen() {
             {post.address && <Text style={s.metaItem}>📍 {post.address}</Text>}
             <View style={s.metaRow}>
               <Text style={s.metaItem}>⏰ Pickup by {formatDate(post.pickupBy)}</Text>
-              <Text style={[s.metaItem, { color: Colors.primary, fontWeight: FontWeight.bold }]}>🌿 {post.predictedWasteKg} kg saved</Text>
+              <Text style={[s.metaItem, { color: Colors.primary, fontWeight: FontWeight.bold }]}>🌿 {post.predictedSurplusKg} kg saved</Text>
             </View>
             <View style={s.claimRow}>
               <View style={s.portionInput}>

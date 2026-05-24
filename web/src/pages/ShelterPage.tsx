@@ -13,11 +13,28 @@ import { OptimizedRoute } from '../services/routeOptimization';
 import { DirectionsResult } from '../services/routing';
 import DirectionsPanel from '../components/map/DirectionsPanel';
 
+// Haversine distance in km between two lat/lng points
+const haversineKm = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLng = (lng2 - lng1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
 export const ShelterPage: React.FC = () => {
   const { user } = useAuth();
-  const { posts, claimBulkOrder, completePost, loading } = usePosts();
+  // Pass user coords so usePosts fetches only posts within 20 km server-side
+  const { posts, claimBulkOrder, completePost, loading } = usePosts(
+    user?.lat !== undefined && user?.lng !== undefined
+      ? { lat: user.lat, lng: user.lng }
+      : undefined
+  );
   const { shelterLeaderboard } = useLeaderboard();
-  
+
   // Portions selection state indexed by post ID
   const [selectedPortions, setSelectedPortions] = useState<Record<string, number>>({});
   const [routeGeometry, setRouteGeometry] = useState<Array<[number, number]> | undefined>(undefined);
@@ -25,7 +42,7 @@ export const ShelterPage: React.FC = () => {
   const [directionsTarget, setDirectionsTarget] = useState<{ lat: number; lng: number; name?: string } | null>(null);
   const mapRef = useRef<OpenFreeMapHandle>(null);
 
-  // Active bulk posts available for claim
+  // Active bulk posts available for claim (backend already filters by 20 km; this is a safety client-side guard)
   const availablePosts = posts.filter(p => p.status === 'active' && p.portions > 0);
 
   // Posts claimed by this shelter
@@ -167,11 +184,36 @@ export const ShelterPage: React.FC = () => {
         'div',
         null,
         React.createElement('h2', { className: 'mb-2' }, 'Available Bulk Food Posts'),
+        // Proximity notice when user has location
+        user?.lat !== undefined && user?.lng !== undefined && React.createElement(
+          'div',
+          {
+            style: {
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              background: 'rgba(33,150,243,0.07)', border: '1px solid rgba(33,150,243,0.18)',
+              borderRadius: 'var(--radius-sm)', padding: '0.5rem 0.8rem', marginBottom: '0.8rem',
+              fontSize: '0.82rem', color: 'var(--text-secondary)'
+            }
+          },
+          React.createElement(Icons.MapPin, { size: 14, color: 'var(--secondary-color)' }),
+          'Showing donations within 20 km of your registered location only.'
+        ),
         availablePosts.length === 0
           ? React.createElement(
               Card,
               null,
-              React.createElement('p', { className: 'text-center', style: { color: 'var(--text-secondary)' } }, 'No active bulk food posts available right now. Check back later!')
+              React.createElement(
+                'div',
+                { style: { textAlign: 'center', padding: '1rem 0' } },
+                React.createElement('p', { style: { color: 'var(--text-secondary)', marginBottom: '0.4rem' } },
+                  user?.lat !== undefined
+                    ? '📍 No active food donations within 20 km of your location right now.'
+                    : 'No active bulk food posts available right now.'
+                ),
+                user?.lat !== undefined && React.createElement('p', { style: { color: 'var(--text-light)', fontSize: '0.82rem' } },
+                  'Restaurants near you will appear here when they post surplus food.'
+                )
+              )
             )
           : React.createElement(
               'div',
@@ -179,6 +221,12 @@ export const ShelterPage: React.FC = () => {
               availablePosts.map((post) => {
                 const targetPortions = selectedPortions[post.id] || post.portions;
                 const projectedPoints = targetPortions * 5;
+                // Compute distance from shelter to this post
+                const distKm =
+                  user?.lat !== undefined && user?.lng !== undefined &&
+                  post.lat !== undefined && post.lng !== undefined
+                    ? haversineKm(user.lat, user.lng, post.lat, post.lng)
+                    : null;
 
                 return React.createElement(
                   'div',
@@ -186,14 +234,33 @@ export const ShelterPage: React.FC = () => {
                   React.createElement(
                     'div',
                     { className: 'flex justify-between align-center' },
-                    React.createElement('h3', { style: { fontSize: '1.25rem', color: 'var(--primary-color)', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' } }, 
+                    React.createElement('h3', { style: { fontSize: '1.25rem', color: 'var(--primary-color)', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' } },
                       React.createElement(Icons.Utensils, { size: 18, color: 'var(--primary-color)' }),
                       post.restaurantName
                     ),
                     React.createElement(
-                      'span',
-                      { className: 'badge badge-active' },
-                      'ACTIVE'
+                      'div',
+                      { style: { display: 'flex', gap: '0.4rem', alignItems: 'center' } },
+                      // Distance pill
+                      distKm !== null && React.createElement(
+                        'span',
+                        {
+                          style: {
+                            display: 'inline-flex', alignItems: 'center', gap: '0.2rem',
+                            background: distKm <= 5
+                              ? 'rgba(46,125,50,0.1)' : distKm <= 12
+                              ? 'rgba(255,152,0,0.1)' : 'rgba(33,150,243,0.1)',
+                            color: distKm <= 5
+                              ? 'var(--primary-color)' : distKm <= 12
+                              ? '#e65100' : 'var(--secondary-color)',
+                            border: `1px solid ${distKm <= 5 ? 'rgba(46,125,50,0.25)' : distKm <= 12 ? 'rgba(255,152,0,0.25)' : 'rgba(33,150,243,0.25)'}`,
+                            borderRadius: '999px', padding: '0.15rem 0.5rem', fontSize: '0.75rem', fontWeight: 700
+                          }
+                        },
+                        React.createElement(Icons.MapPin, { size: 10 }),
+                        `${distKm.toFixed(1)} km away`
+                      ),
+                      React.createElement('span', { className: 'badge badge-active' }, 'ACTIVE')
                     )
                   ),
                   React.createElement(
@@ -207,7 +274,7 @@ export const ShelterPage: React.FC = () => {
                     post.address && React.createElement(
                       'div',
                       { className: 'meta-item', style: { gridColumn: 'span 2' } },
-                      React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
+                      React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } },
                         React.createElement(Icons.MapPin, { size: 12 }),
                         'Location Address'
                       ),
@@ -216,7 +283,7 @@ export const ShelterPage: React.FC = () => {
                     React.createElement(
                       'div',
                       { className: 'meta-item' },
-                      React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
+                      React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } },
                         React.createElement(Icons.Calendar, { size: 12 }),
                         'Posted At'
                       ),
@@ -225,7 +292,7 @@ export const ShelterPage: React.FC = () => {
                     React.createElement(
                       'div',
                       { className: 'meta-item' },
-                      React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
+                      React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } },
                         React.createElement(Icons.Calendar, { size: 12, color: 'var(--secondary-color)' }),
                         'Pickup By'
                       ),
@@ -234,14 +301,14 @@ export const ShelterPage: React.FC = () => {
                     React.createElement(
                       'div',
                       { className: 'meta-item' },
-                      React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
+                      React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } },
                         React.createElement(Icons.Leaf, { size: 12, color: 'var(--primary-color)' }),
-                        'Est. Waste Saved'
+                        'Est. Surplus Saved'
                       ),
-                      React.createElement('span', { className: 'meta-value', style: { color: 'var(--primary-color)', fontWeight: '600' } }, `${post.predictedWasteKg} kg`)
+                      React.createElement('span', { className: 'meta-value', style: { color: 'var(--primary-color)', fontWeight: '600' } }, `${post.predictedSurplusKg} kg`)
                     )
                   ),
-                  
+
                   // Portion Claim Selector and Action Button
                   React.createElement(
                     'div',

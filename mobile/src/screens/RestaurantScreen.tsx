@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 import { usePosts } from '../hooks/usePosts';
-import { formatDate, formatWaste } from '../utils/format';
+import { formatDate, formatSurplus } from '../utils/format';
 import { Colors, Spacing, Radius, FontSize, FontWeight, Shadow } from '../theme';
 
 export default function RestaurantScreen() {
@@ -16,7 +16,7 @@ export default function RestaurantScreen() {
   const myPosts = posts.filter(p => p.restaurantId === user?.id);
   const activeCount = myPosts.filter(p => p.status === 'active').length;
   const claimedCount = myPosts.filter(p => p.status === 'claimed').length;
-  const totalWasteSaved = myPosts.reduce((acc, p) => acc + p.predictedWasteKg, 0);
+  const totalSurplusSaved = myPosts.reduce((acc, p) => acc + (p.predictedSurplusKg || 0), 0);
 
   const handleSubmit = () => {
     const p = parseInt(portions) || 0;
@@ -35,7 +35,7 @@ export default function RestaurantScreen() {
         <Text style={s.welcome}>Welcome, {user?.name || 'Restaurant'}! 🍽️</Text>
         <Text style={s.headerSub}>Track your surplus food metrics and impact.</Text>
         <View style={s.statsRow}>
-          {[{ v: activeCount, l: 'Active', c: Colors.primary }, { v: claimedCount, l: 'Claimed', c: Colors.secondary }, { v: `${totalWasteSaved.toFixed(1)} kg`, l: 'Saved', c: Colors.primary }].map((st, i) => (
+          {[{ v: activeCount, l: 'Active', c: Colors.primary }, { v: claimedCount, l: 'Claimed', c: Colors.secondary }, { v: `${totalSurplusSaved.toFixed(1)} kg`, l: 'Saved', c: Colors.primary }].map((st, i) => (
             <View key={i} style={s.statBox}><Text style={[s.statVal, { color: st.c }]}>{st.v}</Text><Text style={s.statLbl}>{st.l}</Text></View>
           ))}
         </View>
@@ -80,8 +80,8 @@ export default function RestaurantScreen() {
             <Text style={s.metaLabel}>⏰ Pickup By</Text><Text style={[s.metaVal, { color: Colors.secondary }]}>{formatDate(post.pickupBy)}</Text>
           </View>
           <View style={s.wasteRow}>
-            <Text style={s.wasteLabel}>🌿 AI Waste Prediction:</Text>
-            <Text style={s.wasteVal}>{formatWaste(post.predictedWasteKg)}</Text>
+            <Text style={s.wasteLabel}>🌿 AI Surplus Saved:</Text>
+            <Text style={s.wasteVal}>{formatSurplus(post.predictedSurplusKg)}</Text>
           </View>
           {post.status === 'claimed' && <Text style={s.claimedText}>✅ Claimed by a volunteer</Text>}
         </View>

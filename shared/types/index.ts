@@ -16,8 +16,8 @@ export interface FoodPost {
   restaurantId: string;
   restaurantName: string;
   portions: number;
-  predictedWasteKg: number;
-  status: 'active' | 'claimed' | 'completed';
+  predictedSurplusKg: number;
+  status: 'active' | 'claimed' | 'completed' | 'deleted';
   createdAt: string;
   pickupBy: string;
   claimedBy?: string;          // user ID (individual or shelter)
@@ -25,6 +25,7 @@ export interface FoodPost {
   lat?: number;                // for map view
   lng?: number;
   address?: string;
+  deleteReason?: string;
 }
 
 export interface User {

@@ -3,15 +3,16 @@ import { useAuth } from '../hooks/useAuth';
 import { usePosts } from '../hooks/usePosts';
 import PostForm from '../components/restaurant/PostForm';
 import RestaurantDashboard from '../components/restaurant/RestaurantDashboard';
+import SalesUpload from '../components/restaurant/SalesUpload';
 
 export const RestaurantPage: React.FC = () => {
   const { user } = useAuth();
-  const { posts, createPost, loading } = usePosts();
+  const { posts, createPost, deletePost, loading } = usePosts();
   
-  const myPosts = posts.filter(p => p.restaurantId === user?.id);
+  const myPosts = posts.filter(p => p.restaurantId === user?.id && p.status !== 'deleted');
   const activeCount = myPosts.filter(p => p.status === 'active').length;
   const claimedCount = myPosts.filter(p => p.status === 'claimed').length;
-  const totalWasteSaved = myPosts.reduce((acc, p) => acc + p.predictedWasteKg, 0);
+  const totalSurplusSaved = myPosts.reduce((acc, p) => acc + (p.predictedSurplusKg || 0), 0);
 
   return React.createElement(
     'div',
@@ -58,16 +59,21 @@ export const RestaurantPage: React.FC = () => {
         React.createElement(
           'div',
           { style: { textAlign: 'center', minWidth: '95px', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(46,125,50,0.1)' } },
-          React.createElement('span', { style: { fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem', fontWeight: 600 } }, 'Waste Saved'),
-          React.createElement('span', { style: { fontSize: '1.35rem', fontWeight: '800', color: 'var(--primary-color)' } }, `${totalWasteSaved.toFixed(1)} kg`)
+          React.createElement('span', { style: { fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem', fontWeight: 600 } }, 'Surplus Saved'),
+          React.createElement('span', { style: { fontSize: '1.35rem', fontWeight: '800', color: 'var(--primary-color)' } }, `${totalSurplusSaved.toFixed(1)} kg`)
         )
       )
     ),
     React.createElement(
       'div',
       { className: 'dashboard-grid mask-reveal delay-2' },
-      React.createElement(PostForm, { onCreatePost: createPost, loading: loading }),
-      React.createElement(RestaurantDashboard, null)
+      React.createElement(
+        'div',
+        { style: { display: 'flex', flexDirection: 'column', gap: '2rem' } },
+        React.createElement(PostForm, { onCreatePost: createPost, loading: loading, restaurantId: user?.id || '' }),
+        React.createElement(SalesUpload, { restaurantId: user?.id || '', onTrainingComplete: () => { console.log('AI model training completed!'); } })
+      ),
+      React.createElement(RestaurantDashboard, { posts: posts, loading: loading, onDeletePost: deletePost })
     )
   );
 };

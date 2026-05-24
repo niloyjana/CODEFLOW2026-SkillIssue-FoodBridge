@@ -3,7 +3,9 @@ import { FoodPost } from 'shared/types';
 import { apiService } from '../services/api';
 import { useAuth } from './useAuth';
 
-export const usePosts = () => {
+const NEARBY_RADIUS_KM = 20;
+
+export const usePosts = (locationFilter?: { lat?: number; lng?: number }) => {
   const [posts, setPosts] = useState<FoodPost[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,20 +15,28 @@ export const usePosts = () => {
     setLoading(true);
     setError(null);
     try {
-      const fetched = await apiService.getPosts();
+      const lat = locationFilter?.lat;
+      const lng = locationFilter?.lng;
+      const fetched = await apiService.getPosts(
+        lat !== undefined && lng !== undefined
+          ? { lat, lng, radius: NEARBY_RADIUS_KM }
+          : undefined
+      );
       setPosts(fetched);
     } catch (e: any) {
       setError(e.message || 'Failed to fetch posts');
     } finally {
       setLoading(false);
     }
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locationFilter?.lat, locationFilter?.lng]);
 
   const createPost = async (postData: {
     portions: number;
     mealTime: 'breakfast' | 'lunch' | 'dinner';
     venueType: 'cafe' | 'restaurant' | 'fastfood';
     seatingCapacity: number;
+    useAi: boolean;
   }) => {
     if (!user) {
       setError('User session not found');
@@ -41,10 +51,36 @@ export const usePosts = () => {
       });
       setPosts((prev) => [newPost, ...prev]);
       refreshSession();
-      alert(`Posted: Portions: ${newPost.portions}, Meal Time: ${postData.mealTime}, Venue: ${postData.venueType}, Seating: ${postData.seatingCapacity}\nAI Waste Prediction: ${newPost.predictedWasteKg} kg`);
+      if (postData.useAi) {
+        alert(`Posted: Portions: ${newPost.portions}, Meal Time: ${postData.mealTime}, Venue: ${postData.venueType}, Seating: ${postData.seatingCapacity}\nAI Surplus Prediction: ${newPost.predictedSurplusKg} kg`);
+      } else {
+        alert(`Posted: Portions: ${newPost.portions}, Meal Time: ${postData.mealTime}, Venue: ${postData.venueType}, Seating: ${postData.seatingCapacity}`);
+      }
     } catch (e: any) {
       setError(e.message || 'Failed to create post');
       alert(`Error creating post: ${e.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deletePost = async (postId: string, reason: string) => {
+    if (!user) {
+      setError('User session not found');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const deletedPost = await apiService.deletePost(postId, reason);
+      setPosts((prev) =>
+        prev.map((post) => (post.id === postId ? { ...post, status: 'deleted' as const, deleteReason: reason } : post))
+      );
+      refreshSession();
+      alert(`Deleted: Post deleted successfully.`);
+    } catch (e: any) {
+      setError(e.message || 'Failed to delete post');
+      alert(`Error deleting post: ${e.message}`);
     } finally {
       setLoading(false);
     }
@@ -126,6 +162,7 @@ export const usePosts = () => {
     error,
     fetchPosts,
     createPost,
+    deletePost,
     claimPost,
     claimBulkOrder,
     completePost,

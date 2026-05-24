@@ -44,7 +44,7 @@ export const usePosts = () => {
       refreshSession();
       Alert.alert(
         'Posted Successfully',
-        `Portions: ${newPost.portions}\nAI Waste Prediction: ${newPost.predictedWasteKg} kg`
+        `Portions: ${newPost.portions}\nAI Surplus Prediction: ${newPost.predictedSurplusKg} kg`
       );
     } catch (e: any) {
       setError(e.message || 'Failed to create post');

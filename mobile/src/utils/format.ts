@@ -17,8 +17,9 @@ export const formatPortions = (portions: number): string => {
   return `${portions} ${portions === 1 ? 'portion' : 'portions'}`;
 };
 
-export const formatWaste = (kg: number): string => {
-  return `${kg.toFixed(1)} kg`;
+export const formatSurplus = (kg?: number): string => {
+  const val = kg !== undefined && kg !== null ? kg : 0;
+  return `${val.toFixed(1)} kg`;
 };
 
 export const capitalize = (str: string): string => {
