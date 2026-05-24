@@ -10,6 +10,10 @@ import {
 
 import { Platform } from 'react-native';
 
+// ─── MOCK MODE ──────────────────────────────────────────────────────────────
+// Set to true to bypass Firebase auth and backend API calls for demo/testing
+const MOCK_MODE = true;
+
 // Your computer's LAN IP (both phone and computer must be on the same WiFi)
 const LAN_IP = '10.47.145.241';
 
@@ -30,7 +34,63 @@ const STORAGE_KEYS = {
   SESSION: 'foodbridge_session',
 };
 
+// ─── Mock Data ──────────────────────────────────────────────────────────────
+const MOCK_POSTS: FoodPost[] = [
+  {
+    id: 'mock_post_1',
+    restaurantId: 'mock_restaurant',
+    restaurantName: 'Green Kitchen',
+    portions: 12,
+    predictedSurplusKg: 4.5,
+    status: 'active',
+    createdAt: new Date(Date.now() - 3600000).toISOString(),
+    pickupBy: new Date(Date.now() + 7200000).toISOString(),
+    lat: 12.9716,
+    lng: 77.5946,
+    address: '123 MG Road, Bangalore',
+  },
+  {
+    id: 'mock_post_2',
+    restaurantId: 'mock_restaurant',
+    restaurantName: 'Spice Garden',
+    portions: 8,
+    predictedSurplusKg: 3.2,
+    status: 'active',
+    createdAt: new Date(Date.now() - 7200000).toISOString(),
+    pickupBy: new Date(Date.now() + 3600000).toISOString(),
+    lat: 12.9352,
+    lng: 77.6245,
+    address: '456 Koramangala, Bangalore',
+  },
+  {
+    id: 'mock_post_3',
+    restaurantId: 'mock_restaurant_2',
+    restaurantName: 'Daily Bites',
+    portions: 20,
+    predictedSurplusKg: 7.0,
+    status: 'claimed',
+    createdAt: new Date(Date.now() - 10800000).toISOString(),
+    pickupBy: new Date(Date.now() + 1800000).toISOString(),
+    claimedBy: 'mock_shelter',
+    claimedByName: 'Hope Shelter',
+    lat: 12.9611,
+    lng: 77.6387,
+    address: '789 Indiranagar, Bangalore',
+  },
+];
+
+const MOCK_LEADERBOARD: LeaderboardEntry[] = [
+  { id: '1', name: 'Green Kitchen', points: 450, userType: 'restaurant', completedPickups: 30, totalKgSaved: 120 },
+  { id: '2', name: 'Spice Garden', points: 380, userType: 'restaurant', completedPickups: 25, totalKgSaved: 95 },
+  { id: '3', name: 'Hope Shelter', points: 320, userType: 'shelter', completedPickups: 22, peopleServed: 500 },
+  { id: '4', name: 'Rahul M', points: 210, userType: 'individual', completedPickups: 15, badges: ['First Pickup', 'Weekly Hero'] },
+  { id: '5', name: 'Daily Bites', points: 180, userType: 'restaurant', completedPickups: 12, totalKgSaved: 55 },
+];
+
+let mockPostsInMemory = [...MOCK_POSTS];
+
 const getAuthHeaders = async () => {
+  if (MOCK_MODE) return {};
   const user = firebaseAuth.currentUser;
   if (user) {
     const token = await user.getIdToken(true);
@@ -41,8 +101,21 @@ const getAuthHeaders = async () => {
 
 export const apiService = {
   login: async (email: string, type: UserType): Promise<User> => {
-    const password = `${email.split('@')[0]}FB123!`;
+    if (MOCK_MODE) {
+      await new Promise((r) => setTimeout(r, 500));
+      const user: User = {
+        id: `mock_${type}`,
+        name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
+        email,
+        type,
+        points: type === 'restaurant' ? 450 : type === 'shelter' ? 320 : 210,
+        createdAt: new Date().toISOString(),
+      };
+      await AsyncStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(user));
+      return user;
+    }
 
+    const password = `${email.split('@')[0]}FB123!`;
     const credential = await signInWithEmailAndPassword(
       firebaseAuth,
       email,
@@ -67,8 +140,21 @@ export const apiService = {
     type: UserType,
     extraFields?: any
   ): Promise<User> => {
-    const password = `${email.split('@')[0]}FB123!`;
+    if (MOCK_MODE) {
+      await new Promise((r) => setTimeout(r, 500));
+      const user: User = {
+        id: `mock_${type}`,
+        name,
+        email,
+        type,
+        points: 0,
+        createdAt: new Date().toISOString(),
+      };
+      await AsyncStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(user));
+      return user;
+    }
 
+    const password = `${email.split('@')[0]}FB123!`;
     const credential = await createUserWithEmailAndPassword(
       firebaseAuth,
       email,
@@ -88,10 +174,12 @@ export const apiService = {
   },
 
   logout: async (): Promise<void> => {
-    await signOut(firebaseAuth);
-    try {
-      await axios.post(`${ENDPOINTS.auth}/logout`);
-    } catch {}
+    if (!MOCK_MODE) {
+      await signOut(firebaseAuth);
+      try {
+        await axios.post(`${ENDPOINTS.auth}/logout`);
+      } catch {}
+    }
     await AsyncStorage.removeItem(STORAGE_KEYS.SESSION);
   },
 
@@ -105,6 +193,9 @@ export const apiService = {
   },
 
   getPosts: async (): Promise<FoodPost[]> => {
+    if (MOCK_MODE) {
+      return [...mockPostsInMemory];
+    }
     const headers = await getAuthHeaders();
     const response = await axios.get(ENDPOINTS.posts, { headers });
     return response.data;
@@ -117,12 +208,38 @@ export const apiService = {
     seatingCapacity: number;
     currentUser: User;
   }): Promise<FoodPost> => {
+    if (MOCK_MODE) {
+      const newPost: FoodPost = {
+        id: `mock_${Date.now()}`,
+        restaurantId: postData.currentUser.id,
+        restaurantName: postData.currentUser.name,
+        portions: postData.portions,
+        predictedSurplusKg: postData.portions * 0.35,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        pickupBy: new Date(Date.now() + 7200000).toISOString(),
+        lat: 12.9716,
+        lng: 77.5946,
+        address: postData.currentUser.address || 'Mock Address',
+      };
+      mockPostsInMemory.unshift(newPost);
+      return newPost;
+    }
     const headers = await getAuthHeaders();
     const response = await axios.post(ENDPOINTS.posts, postData, { headers });
     return response.data;
   },
 
   claimPost: async (postId: string, currentUser: User): Promise<FoodPost> => {
+    if (MOCK_MODE) {
+      const post = mockPostsInMemory.find((p) => p.id === postId);
+      if (post) {
+        post.status = 'claimed';
+        post.claimedBy = currentUser.id;
+        post.claimedByName = currentUser.name;
+      }
+      return post!;
+    }
     const headers = await getAuthHeaders();
     const response = await axios.post(
       ENDPOINTS.claimIndividual,
@@ -137,6 +254,15 @@ export const apiService = {
     portions: number,
     currentUser: User
   ): Promise<FoodPost> => {
+    if (MOCK_MODE) {
+      const post = mockPostsInMemory.find((p) => p.id === postId);
+      if (post) {
+        post.status = 'claimed';
+        post.claimedBy = currentUser.id;
+        post.claimedByName = currentUser.name;
+      }
+      return post!;
+    }
     const headers = await getAuthHeaders();
     const response = await axios.post(
       ENDPOINTS.claimBulk,
@@ -150,6 +276,13 @@ export const apiService = {
     postId: string,
     currentUser: User
   ): Promise<FoodPost> => {
+    if (MOCK_MODE) {
+      const post = mockPostsInMemory.find((p) => p.id === postId);
+      if (post) {
+        post.status = 'completed';
+      }
+      return post!;
+    }
     const headers = await getAuthHeaders();
     const response = await axios.post(
       `${ENDPOINTS.posts}/${postId}/complete`,
@@ -160,6 +293,9 @@ export const apiService = {
   },
 
   getLeaderboard: async (): Promise<LeaderboardEntry[]> => {
+    if (MOCK_MODE) {
+      return [...MOCK_LEADERBOARD];
+    }
     const headers = await getAuthHeaders();
     const response = await axios.get(ENDPOINTS.leaderboard, { headers });
     return response.data;

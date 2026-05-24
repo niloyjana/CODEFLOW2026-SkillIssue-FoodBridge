@@ -30,6 +30,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const isManualAuthInProgress = useRef(false);
 
   useEffect(() => {
+    // In mock mode, just restore from AsyncStorage — don't rely on Firebase
+    const restoreSession = async () => {
+      const session = await apiService.getCurrentSession();
+      if (session) {
+        setUser(session);
+      }
+      setLoading(false);
+    };
+
+    restoreSession();
+
+    // Only listen to Firebase auth state when NOT in mock mode
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser: FirebaseUser | null) => {
@@ -41,10 +53,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           if (session) {
             setUser(session);
           }
-        } else {
-          setUser(null);
         }
-        setLoading(false);
+        // Don't null-out user if we already have a session (mock mode)
       }
     );
     return () => unsubscribe();

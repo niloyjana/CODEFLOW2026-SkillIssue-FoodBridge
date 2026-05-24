@@ -51,14 +51,9 @@ export const usePosts = (locationFilter?: { lat?: number; lng?: number }) => {
       });
       setPosts((prev) => [newPost, ...prev]);
       refreshSession();
-      if (postData.useAi) {
-        alert(`Posted: Portions: ${newPost.portions}, Meal Time: ${postData.mealTime}, Venue: ${postData.venueType}, Seating: ${postData.seatingCapacity}\nAI Surplus Prediction: ${newPost.predictedSurplusKg} kg`);
-      } else {
-        alert(`Posted: Portions: ${newPost.portions}, Meal Time: ${postData.mealTime}, Venue: ${postData.venueType}, Seating: ${postData.seatingCapacity}`);
-      }
+
     } catch (e: any) {
       setError(e.message || 'Failed to create post');
-      alert(`Error creating post: ${e.message}`);
     } finally {
       setLoading(false);
     }
@@ -77,10 +72,8 @@ export const usePosts = (locationFilter?: { lat?: number; lng?: number }) => {
         prev.map((post) => (post.id === postId ? { ...post, status: 'deleted' as const, deleteReason: reason } : post))
       );
       refreshSession();
-      alert(`Deleted: Post deleted successfully.`);
     } catch (e: any) {
       setError(e.message || 'Failed to delete post');
-      alert(`Error deleting post: ${e.message}`);
     } finally {
       setLoading(false);
     }
@@ -99,10 +92,8 @@ export const usePosts = (locationFilter?: { lat?: number; lng?: number }) => {
         prev.map((post) => (post.id === postId ? updatedPost : post))
       );
       refreshSession();
-      alert(`Claimed: Successfully claimed the post from ${updatedPost.restaurantName}!`);
     } catch (e: any) {
       setError(e.message || 'Failed to claim post');
-      alert(`Error claiming post: ${e.message}`);
     } finally {
       setLoading(false);
     }
@@ -121,10 +112,8 @@ export const usePosts = (locationFilter?: { lat?: number; lng?: number }) => {
         prev.map((post) => (post.id === postId ? updatedPost : post))
       );
       refreshSession();
-      alert(`Claimed: Successfully claimed ${portions} portions from ${updatedPost.restaurantName}!`);
     } catch (e: any) {
       setError(e.message || 'Failed to claim bulk order');
-      alert(`Error claiming bulk order: ${e.message}`);
     } finally {
       setLoading(false);
     }
@@ -143,10 +132,8 @@ export const usePosts = (locationFilter?: { lat?: number; lng?: number }) => {
         prev.map((post) => (post.id === postId ? updatedPost : post))
       );
       refreshSession();
-      alert(`Completed: Order from ${updatedPost.restaurantName} marked as completed/distributed!`);
     } catch (e: any) {
       setError(e.message || 'Failed to complete order');
-      alert(`Error completing order: ${e.message}`);
     } finally {
       setLoading(false);
     }

@@ -68,8 +68,11 @@ export const Leaderboard: React.FC = () => {
       loading
         ? React.createElement('div', { className: 'text-center' }, 'Loading scores...')
         : React.createElement(
-            'table',
-            { className: 'leaderboard-table' },
+            'div',
+            { style: { overflowX: 'auto', width: '100%' } },
+            React.createElement(
+              'table',
+              { className: 'leaderboard-table', style: { minWidth: '600px' } },
             React.createElement(
               'thead',
               null,
@@ -153,6 +156,7 @@ export const Leaderboard: React.FC = () => {
               )
             )
           )
+        )
     )
   );
 };

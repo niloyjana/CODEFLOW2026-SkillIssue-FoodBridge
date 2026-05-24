@@ -1,6 +1,9 @@
 .login-page-wrapper {
-  height: calc(100vh - 70px);
-  width: 100%;
+  position: fixed;
+  top: 49px;
+  left: 0;
+  height: calc(100vh - 49px);
+  width: 100vw;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -9,6 +12,7 @@
   justify-content: center;
   padding: 1rem;
   overflow: hidden;
+  z-index: 10;
 }
 
 .login-card-container {
@@ -288,6 +292,17 @@
 
 .login-link:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .login-page-wrapper {
+    position: absolute;
+    min-height: calc(100vh - 49px);
+    height: auto;
+    overflow-y: auto;
+    align-items: flex-start;
+    padding: 2.5rem 1rem;
+  }
 }
 
 

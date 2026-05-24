@@ -109,7 +109,7 @@ export const Login: React.FC = () => {
           left: 0,
           width: '100vw',
           height: '100vh',
-          backgroundImage: "url('/bg.png')",
+          backgroundImage: "url('/bg.jpeg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           zIndex: -1
