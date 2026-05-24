@@ -18,6 +18,9 @@ const API_BASE_URL = Platform.OS === 'web'
   ? 'http://localhost:5000'
   : `http://${LAN_IP}:5000`;
 
+// Toggle for switching between mock simulation and actual API calls
+export const MOCK_MODE = false;
+
 const ENDPOINTS = {
   posts: `${API_BASE_URL}/api/posts`,
   leaderboard: `${API_BASE_URL}/api/leaderboard`,
