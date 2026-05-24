@@ -9,6 +9,7 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -50,18 +51,39 @@ export const Navbar: React.FC = () => {
       { to: '/', className: 'navbar-brand', style: { padding: 0 } },
       React.createElement('img', { 
         src: '/logo.png', 
-        alt: 'FoodBridge', 
-        style: { height: '80px', objectFit: 'contain' } 
-      })
+        alt: 'FoodBridge Logo', 
+        style: { height: '40px', objectFit: 'contain' } 
+      }),
+      'Food',
+      React.createElement('span', null, 'Bridge')
+    ),
+    React.createElement(
+      'button',
+      {
+        className: 'navbar-toggle',
+        onClick: () => setMobileMenuOpen(!mobileMenuOpen),
+        style: {
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          color: 'var(--text-primary)',
+          padding: '0.5rem',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 5100
+        }
+      },
+      React.createElement(mobileMenuOpen ? Icons.X : Icons.Menu, { size: 24 })
     ),
     React.createElement(
       'div',
-      { className: 'navbar-links' },
+      { className: `navbar-links ${mobileMenuOpen ? 'mobile-open' : ''}` },
       user && user.type === 'restaurant' && React.createElement(
         NavLink,
         {
           to: '/restaurant',
-          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
+          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`,
+          onClick: () => setMobileMenuOpen(false)
         },
         'Dashboard'
       ),
@@ -69,7 +91,8 @@ export const Navbar: React.FC = () => {
         NavLink,
         {
           to: '/shelter',
-          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
+          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`,
+          onClick: () => setMobileMenuOpen(false)
         },
         'Available Food'
       ),
@@ -77,7 +100,8 @@ export const Navbar: React.FC = () => {
         NavLink,
         {
           to: '/individual',
-          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
+          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`,
+          onClick: () => setMobileMenuOpen(false)
         },
         'Donate Food'
       ),
@@ -85,7 +109,8 @@ export const Navbar: React.FC = () => {
         NavLink,
         {
           to: '/leaderboard',
-          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
+          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`,
+          onClick: () => setMobileMenuOpen(false)
         },
         'Leaderboard'
       ),
@@ -93,7 +118,7 @@ export const Navbar: React.FC = () => {
         'a',
         {
           href: '/#about-us',
-          onClick: handleAboutClick,
+          onClick: (e: any) => { handleAboutClick(e); setMobileMenuOpen(false); },
           className: 'nav-link',
           style: { cursor: 'pointer' }
         },
@@ -182,9 +207,9 @@ export const Navbar: React.FC = () => {
         React.createElement(
           'button',
           { 
-            onClick: handleLogout, 
+            onClick: () => { handleLogout(); setMobileMenuOpen(false); }, 
             className: 'btn btn-secondary', 
-            style: { padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' } 
+            style: { padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontStyle: 'italic', fontFamily: 'var(--font-heading)' } 
           },
           React.createElement(Icons.LogOut, { size: 14 }),
           'Logout'
@@ -196,7 +221,8 @@ export const Navbar: React.FC = () => {
           NavLink,
           {
             to: '/login',
-            className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
+            className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`,
+            onClick: () => setMobileMenuOpen(false)
           },
           'Login'
         ),
@@ -204,7 +230,8 @@ export const Navbar: React.FC = () => {
           NavLink,
           {
             to: '/register',
-            className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
+            className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`,
+            onClick: () => setMobileMenuOpen(false)
           },
           'Register'
         )

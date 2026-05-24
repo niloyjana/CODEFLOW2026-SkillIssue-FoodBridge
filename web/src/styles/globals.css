@@ -142,7 +142,9 @@ h6 {
   text-decoration: none;
   color: var(--text-secondary);
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  font-family: var(--font-heading);
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
@@ -171,6 +173,8 @@ h6 {
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
+  font-style: italic;
+  font-family: var(--font-heading);
 }
 
 .user-points {
@@ -180,6 +184,8 @@ h6 {
   background: var(--secondary-light);
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius-full);
+  font-style: italic;
+  font-family: var(--font-heading);
 }
 
 /* Cards & Glassmorphism Panels */
@@ -871,6 +877,8 @@ h6 {
   align-items: center;
   justify-content: center;
   border: 2px solid white;
+  font-style: italic;
+  font-family: var(--font-heading);
 }
 
 .notification-dropdown {
@@ -976,4 +984,62 @@ h6 {
   color: var(--text-secondary);
   font-size: 0.85rem;
   background: rgba(255, 255, 255, 0.95);
+}
+
+/* ─── Mobile Navbar & Responsiveness ───────────────────────────────────── */
+
+.navbar-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar-toggle {
+    display: flex !important;
+  }
+
+  .navbar {
+    padding: 0.25rem 1rem !important;
+  }
+
+  .navbar-links {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    padding: 1.2rem !important;
+    gap: 0.8rem !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1) !important;
+    transform: translateY(-10px) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    z-index: 4999 !important;
+  }
+
+  .navbar-links.mobile-open {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .nav-user-info {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.8rem !important;
+    border-left: none !important;
+    border-top: 1px solid var(--border-light) !important;
+    padding-left: 0 !important;
+    padding-top: 0.8rem !important;
+    margin-left: 0 !important;
+  }
+
+  .nav-user-info > div {
+    justify-content: flex-start !important;
+  }
 }

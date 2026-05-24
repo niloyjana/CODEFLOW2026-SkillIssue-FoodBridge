@@ -217,6 +217,57 @@ export const Icons = {
       style
     ),
 
+  Database: ({ size = 20, color = 'currentColor', className = '', style }: IconProps) =>
+    createSvg(
+      React.createElement(React.Fragment, null,
+        React.createElement('ellipse', { cx: '12', cy: '5', rx: '9', ry: '3' }),
+        React.createElement('path', { d: 'M3 5V19A9 3 0 0 0 21 19V5' }),
+        React.createElement('path', { d: 'M3 12A9 3 0 0 0 21 12' })
+      ),
+      size,
+      color,
+      className,
+      style
+    ),
+
+  AlertCircle: ({ size = 20, color = 'currentColor', className = '', style }: IconProps) =>
+    createSvg(
+      React.createElement(React.Fragment, null,
+        React.createElement('circle', { cx: '12', cy: '12', r: '10' }),
+        React.createElement('line', { x1: '12', y1: '8', x2: '12', y2: '12' }),
+        React.createElement('line', { x1: '12', y1: '16', x2: '12.01', y2: '16' })
+      ),
+      size,
+      color,
+      className,
+      style
+    ),
+
+  Menu: ({ size = 20, color = 'currentColor', className = '', style }: IconProps) =>
+    createSvg(
+      React.createElement(React.Fragment, null,
+        React.createElement('line', { x1: '4', y1: '12', x2: '20', y2: '12' }),
+        React.createElement('line', { x1: '4', y1: '6', x2: '20', y2: '6' }),
+        React.createElement('line', { x1: '4', y1: '18', x2: '20', y2: '18' })
+      ),
+      size,
+      color,
+      className,
+      style
+    ),
+
+  X: ({ size = 20, color = 'currentColor', className = '', style }: IconProps) =>
+    createSvg(
+      React.createElement(React.Fragment, null,
+        React.createElement('line', { x1: '18', y1: '6', x2: '6', y2: '18' }),
+        React.createElement('line', { x1: '6', y1: '6', x2: '18', y2: '18' })
+      ),
+      size,
+      color,
+      className,
+      style
+    ),
+
   Upload: ({ size = 20, color = 'currentColor', className = '', style }: IconProps) =>
     createSvg(
       React.createElement(React.Fragment, null,

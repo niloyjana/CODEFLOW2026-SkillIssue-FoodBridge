@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { formatDate, formatPortions, formatSurplus } from 'shared/utils/format';
 import Card from '../common/Card';
@@ -111,15 +112,16 @@ export const RestaurantDashboard: React.FC<RestaurantDashboardProps> = ({ posts,
             )
           )
         ),
-    deletePostId && React.createElement(
-      'div',
-      {
-        style: {
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
+    deletePostId && createPortal(
+      React.createElement(
+        'div',
+        {
+          style: {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
           backgroundColor: 'rgba(0, 0, 0, 0.6)',
           backdropFilter: 'blur(5px)',
           zIndex: 99999,
@@ -219,8 +221,10 @@ export const RestaurantDashboard: React.FC<RestaurantDashboardProps> = ({ posts,
           )
         )
       )
-    )
-  );
+    ),
+    document.body
+  )
+);
 };
 
 export default RestaurantDashboard;
