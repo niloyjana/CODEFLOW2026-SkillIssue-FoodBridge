@@ -7,7 +7,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } f
 import { MOCK_POSTS, MOCK_LEADERBOARD } from './mockData';
 
 // Toggle for switching between mock simulation and actual API calls
-export const MOCK_MODE = true;
+export const MOCK_MODE = process.env.NODE_ENV !== 'production';
 
 let mockPostsInMemory = [...MOCK_POSTS];
 let mockLeaderboardInMemory = [...MOCK_LEADERBOARD];
