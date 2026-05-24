@@ -11,6 +11,18 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 CORS(app) # Allow CORS for frontend integration
 
+class PrefixMiddleware(object):
+    def __init__(self, app, prefix=''):
+        self.app = app
+        self.prefix = prefix
+    def __call__(self, environ, start_response):
+        if environ.get('PATH_INFO', '').startswith(self.prefix):
+            environ['PATH_INFO'] = environ['PATH_INFO'][len(self.prefix):]
+            environ['SCRIPT_NAME'] = self.prefix
+        return self.app(environ, start_response)
+
+app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/api/ai')
+
 MODEL_PATH = 'waste_model.pkl'
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'csv'}
