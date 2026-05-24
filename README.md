@@ -1,85 +1,50 @@
 # FoodBridge 🍲
 
-> Restaurants donate. Shelters receive. Individuals act. Waste stops.
+> Restaurants donate. Shelters receive. Individuals act. Surplus is saved.
 
-FoodBridge is an AI-powered real-time food redistribution platform designed to reduce food waste and connect surplus food with people who need it. The platform combines machine learning, real-time synchronization, gamification, and open-source mapping to create a scalable and low-cost coordination system.
+FoodBridge is an AI-powered real-time surplus-food redistribution platform designed to save food surplus and connect fresh surplus meals with local communities. The platform combines machine learning, real-time Firestore database synchronization, gamification, and open-source maps to create a scalable, zero-cost coordination system.
 
 ---
 
 # 🚀 Problem Statement
 
-Every day, restaurants and food businesses throw away large amounts of perfectly edible food while shelters and individuals struggle to access meals. Existing food rescue platforms mainly redistribute surplus food after waste already occurs.
+Every day, restaurants and food businesses throw away large amounts of perfectly edible food while shelters and individuals struggle to access meals. Existing food rescue platforms mainly redistribute surplus food after it already occurs.
 
 FoodBridge solves this through:
-
-* AI-powered food surplus prediction based on sales data of restaurants
-* Real-time food redistribution
-* Gamified community participation
-* Zero-cost scalable architecture
-* Smart coordination between restaurants, shelters, and individuals
+* **AI-powered food surplus prediction:** Helping restaurants anticipate and list surplus food before it's thrown out.
+* **Real-time food redistribution:** Instant database synchronization so shelters and volunteers view live donations.
+* **Gamified community participation:** Earn points and unlock badges to encourage ongoing volunteerism.
+* **Zero-cost scalable architecture:** Leveraging OpenFreeMap and free geocoding services to avoid expensive API keys.
+* **Smart coordination:** Connecting restaurants, shelters, and individual volunteers seamlessly.
 
 ---
 
 # ✨ Features Implemented
 
-## ✅ Authentication & User Roles
-
-* Firebase Authentication integration
-* Separate workflows for:
-
-  * Restaurants
-  * Shelters
-  * Individuals
-* Role-based dashboards and access
+## 👤 Authentication & User Roles
+* Firebase Authentication integration (supporting Email/Password and Google Sign-in).
+* Dynamic role selection:
+  * **Restaurants:** Create food posts, access AI surplus predictions, and track historical donations.
+  * **Shelters:** Browse active nearby posts on the map, claim portions in bulk, and track distribution.
+  * **Individuals:** Donate food using AI prediction and earn volunteer achievements.
+* Role-based guarded routing and dashboards.
 
 ---
 
-## ✅ Food Posting & Claim System
-
-Restaurants can:
-
-* Post surplus food listings
-* Add food quantity and pickup details
-* Track claimed donations
-
-Shelters and individuals can:
-
-* Browse nearby food listings
-* Claim available food
-* View pickup information
+## 📦 Food Posting & Claim System
+* **Restaurants** can post surplus food listings (portions, meal time, seating capacity, pickup deadlines, coordinates).
+* **Shelters** can view a map of nearby active food posts and claim portions in bulk (earning 5 points per portion).
+* **Shelter Distribution Tracker** allows shelters to mark claims as "Distributed" to finalize the donation lifecycle.
 
 ---
 
-## ✅ AI Food Surplus Prediction
+## 🤖 AI Food Surplus Prediction
+A custom machine learning service forecasts potential food surplus (in kg) at the time of posting:
+* Built with Python, Flask, scikit-learn, and Random Forest Regression.
+* Predictions are calculated locally using parameters: Day of Week, Meal Time, Venue Type, Seating Capacity, and Portions Prepared.
+* Offline-capable model with ultra-fast local inference under 100ms.
 
-Custom machine learning model built using:
-
-* Python
-* Flask
-* scikit-learn
-* Random Forest Regression
-
-### Prediction Features
-
-The model predicts food waste using:
-
-* Day of week
-* Meal time
-* Venue type
-* Seating capacity
-* Portions prepared
-
-### AI Highlights
-
-* 500 synthetic training samples
-* ~85% confidence predictions
-* Local inference under 100ms
-* Zero API cost
-* Fully offline-compatible model
-
----
-
-# 🧠 AI Architecture
+### AI Architecture
 
 ```text
 Frontend (React)
@@ -91,8 +56,7 @@ Random Forest Model
 Prediction Response
 ```
 
-Example Response:
-
+Example JSON Response:
 ```json
 {
   "predictedKg": 8.5,
@@ -102,60 +66,28 @@ Example Response:
 
 ---
 
-# 🗺️ Real-Time Maps & Routing
-
-Integrated fully free open-source mapping stack:
-
-* OpenFreeMap → map rendering
-* Nominatim → geocoding/search
-* OSRM → route optimization
-
-Features:
-
-* Interactive maps
-* Location-based listings
-* Route visualization
-* Distance-aware food discovery
-* No paid APIs required
+## 🗺️ Real-Time Maps & Routing
+Integrated a fully free, open-source mapping stack to avoid expensive API subscriptions:
+* **OpenFreeMap:** Map rendering using MapLibre GL and Liberty tiles.
+* **Nominatim:** Free geolocation search, autocomplete, and address reverse-geocoding.
+* **OSRM:** Free route optimization and distance matrix estimation.
+* **Features:** Geolocation-aware listings, interactive pin pickers, and live delivery routes.
 
 ---
 
-# 🏆 Gamification System
-
-FoodBridge includes a dual leaderboard and reward system:
-
-### Restaurants
-
-* Ranked by kilograms of food saved
-* Track completed donations
-
-### Shelters
-
-* Ranked by meals distributed
-* Impact tracking
-
-### Individuals
-
-* Earn badges and pickup streaks
-* Community contribution scoring
-
-This increases long-term engagement and encourages regular participation.
+## 🏆 Gamification & Leaderboard
+FoodBridge drives community engagement with reputation tracking:
+* **Restaurants:** Ranked by total kilograms of food surplus saved.
+* **Shelters:** Ranked by cumulative meals/portions distributed.
+* **Individuals:** Earn points and achieve badges (*First Step*, *Consistent Packer*, *Community Hero*, *Surplus Savior*) for donations.
+* Live global leaderboards sorted by user points.
 
 ---
 
-# ⚡ Real-Time Synchronization
-
-Built using Firebase Firestore.
-
-Implemented:
-
-* Real-time updates
-* Live synchronization
-* Optimistic locking
-* Duplicate claim prevention
-* Concurrent transaction handling
-
-This prevents multiple users from claiming the same food simultaneously.
+## ⚡ Real-Time Synchronization
+* Built using Google Cloud Firestore.
+* Real-time listeners automatically update listings, claims, and dashboard points.
+* Transaction-based logic prevents double claiming of portions under concurrent usage.
 
 ---
 
@@ -163,8 +95,9 @@ This prevents multiple users from claiming the same food simultaneously.
 
 | Layer           | Technology         |
 | --------------- | ------------------ |
-| Frontend        | React + TypeScript |
-| Backend         | Node.js + Express  |
+| Web Frontend    | React + TypeScript |
+| Mobile Frontend | React Native + Expo|
+| Backend API     | Node.js + Express  |
 | Database        | Firebase Firestore |
 | Authentication  | Firebase Auth      |
 | AI Runtime      | Python + Flask     |
@@ -181,103 +114,74 @@ This prevents multiple users from claiming the same food simultaneously.
 ```text
 FoodBridge
 │
-├── web/                # React frontend
-├── server/             # Express backend
-├── ai/                 # Flask ML service
+├── web/                # React web frontend
+├── backend/            # Express Node.js backend
+├── mobile/             # React Native (Expo) mobile frontend
+├── ai/                 # Flask ML service (model training & inference)
 │   ├── app.py
 │   ├── train.py
 │   ├── generate_data.py
 │   └── model.pkl
-└── firebase/           # Firestore configuration
+└── shared/             # Shared TypeScript constants, types, and endpoints
 ```
 
 ---
 
 # 🔥 Why FoodBridge Stands Out
 
-Unlike existing food rescue apps such as Too Good To Go, OLIO, and Flashfood, FoodBridge combines:
-
-* Predictive AI
-* Real-time coordination
-* Gamification
-* Multi-user ecosystem
-* Zero-cost infrastructure
-* Open-source mapping
-* Offline-capable ML
-
-Most existing platforms focus only on redistributing surplus food after waste happens.
-
-FoodBridge focuses on:
-
-1. Predicting waste
-2. Coordinating redistribution
-3. Increasing engagement
-4. Scaling affordably
+Unlike traditional platforms, FoodBridge combines:
+1. **Predictive Forecasting:** Flagging potential surplus *before* it gets thrown away.
+2. **Real-time Sync & Transaction Safety:** Instant updates with zero portion-overlap.
+3. **Gamification:** Keeps volunteers and restaurants active with points and badges.
+4. **Zero API Cost Infrastructure:** Runs mapping, routing, and AI models on completely free, open-source stacks.
 
 ---
 
-# 📈 Future Scope
+# ⚙️ Local Setup & Run Instructions
 
-Planned future improvements:
+To run the full stack locally, follow these instructions.
 
-* Food waste heatmaps
-* NGO analytics dashboard
-* Sustainability scoring system
-* Push notifications
-* AI recommendation engine
-* Real-time volunteer coordination
-* Carbon footprint tracking
-
----
-
-# ⚙️ Local Setup
-
-## Frontend
-
+### 1. Frontend Web App
 ```bash
 cd web
 npm install
-npm run dev
+npm start
 ```
+*App will start on `http://localhost:3000`*
 
-## Backend
-
+### 2. Mobile App (Expo React Native)
 ```bash
-cd server
+cd mobile
+npm install
+npm start
+```
+*Use the Expo Go app on your phone to scan the QR code and run it.*
+
+### 3. Backend Server
+Make sure to create a `.env` file in the `backend/` directory referencing your Firebase project credentials.
+```bash
+cd backend
 npm install
 npm run dev
 ```
+*Server will start on `http://localhost:5000`*
 
-## AI Service
-
+### 4. AI Machine Learning Service
 ```bash
 cd ai
 pip install -r requirements.txt
 python app.py
 ```
+*Flask service will start on `http://localhost:5001` or `http://localhost:5002` (depending on local configuration)*
 
 ---
 
 # 🌍 Vision
 
-Food waste is not a storage problem.
-It is a coordination problem.
-
-FoodBridge creates the coordination layer where:
-
-* Restaurants donate
-* Shelters receive
-* Individuals participate
-* Waste stops
+Food surplus is not a supply problem. It is a **coordination problem**. FoodBridge provides the coordination layer to ensure surplus food is redirected to where it matters most, in real time.
 
 ---
 
 # 👥 Team
 
-Built during a hackathon with a focus on:
-
-* Real-world scalability
-* AI-powered impact
-* Production-style architecture
-* Zero-cost deployment
-* Social good through technology
+Built during the College Hackathon with a focus on real-world scalability, AI-powered social impact, and zero-cost infrastructure.
