@@ -12,7 +12,7 @@ Every day, restaurants and food businesses throw away large amounts of perfectly
 
 FoodBridge solves this through:
 
-* AI-powered food waste prediction
+* AI-powered food surplus prediction based on sales data of restaurants
 * Real-time food redistribution
 * Gamified community participation
 * Zero-cost scalable architecture
@@ -50,7 +50,7 @@ Shelters and individuals can:
 
 ---
 
-## ✅ AI Food Waste Prediction
+## ✅ AI Food Surplus Prediction
 
 Custom machine learning model built using:
 
