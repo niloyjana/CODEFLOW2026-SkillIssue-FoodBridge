@@ -79,8 +79,8 @@ export const Login: React.FC = () => {
       if (role === 'restaurant') navigate('/restaurant');
       else if (role === 'shelter') navigate('/shelter');
       else navigate('/individual');
-    } catch (err) {
-      alert('Login failed');
+    } catch (err: any) {
+      alert(`Login failed: ${err.response?.data?.error || err.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -93,8 +93,8 @@ export const Login: React.FC = () => {
       if (selectedRole === 'restaurant') navigate('/restaurant');
       else if (selectedRole === 'shelter') navigate('/shelter');
       else navigate('/individual');
-    } catch (err) {
-      alert('Quick login failed');
+    } catch (err: any) {
+      alert(`Quick login failed: ${err.response?.data?.error || err.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
