@@ -631,6 +631,7 @@ h6 {
 .text-gradient {
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
 }
