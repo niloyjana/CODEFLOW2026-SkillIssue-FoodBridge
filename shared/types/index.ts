@@ -53,3 +53,14 @@ export interface Claim {
   completedAt?: string;
   pointsAwarded: number;
 }
+
+export interface AppNotification {
+  id: string;
+  recipientId: string;
+  title: string;
+  message: string;
+  type: 'claim' | 'complete';
+  createdAt: string;
+  read: boolean;
+  postId: string;
+}

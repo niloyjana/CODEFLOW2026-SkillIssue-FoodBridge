@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FoodPost, LeaderboardEntry, User, UserType } from 'shared/types';
+import { FoodPost, LeaderboardEntry, User, UserType, AppNotification } from 'shared/types';
 import { ENDPOINTS } from 'shared/constants/endpoints';
 import { auth as firebaseAuth } from '../config/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
@@ -261,6 +261,46 @@ export const apiService = {
       result = result.filter(e => e.userType === filterType);
     }
     return result.sort((a, b) => b.points - a.points);
+  },
+
+  // Notifications
+  getNotifications: async (): Promise<AppNotification[]> => {
+    if (!MOCK_MODE) {
+      const headers = await getAuthHeaders();
+      const response = await axios.get(ENDPOINTS.notifications, { headers });
+      return response.data;
+    }
+
+    return [
+      {
+        id: 'mock_notif_1',
+        recipientId: 'mock_user',
+        title: 'Donation Claimed! 🍱',
+        message: 'Volunteers have claimed 1 portion of your dinner donation.',
+        type: 'claim',
+        createdAt: new Date().toISOString(),
+        read: false,
+        postId: 'mock_post_1',
+      }
+    ];
+  },
+
+  markNotificationAsRead: async (id: string): Promise<void> => {
+    if (!MOCK_MODE) {
+      const headers = await getAuthHeaders();
+      await axios.post(`${ENDPOINTS.notifications}/${id}/read`, {}, { headers });
+      return;
+    }
+    console.log(`Mock: marked notification ${id} as read`);
+  },
+
+  markAllNotificationsAsRead: async (): Promise<void> => {
+    if (!MOCK_MODE) {
+      const headers = await getAuthHeaders();
+      await axios.post(`${ENDPOINTS.notifications}/read-all`, {}, { headers });
+      return;
+    }
+    console.log(`Mock: marked all notifications as read`);
   },
 };
 

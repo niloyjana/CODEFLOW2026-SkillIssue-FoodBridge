@@ -1,11 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import Icons from './Icons';
+import { useNotifications } from '../../hooks/useNotifications';
 
 export const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [dropdownOpen]);
 
   const handleLogout = async () => {
     await logout();
@@ -82,6 +100,73 @@ export const Navbar: React.FC = () => {
       user ? React.createElement(
         'div',
         { className: 'nav-user-info' },
+        // Notification bell dropdown for donators
+        (user.type === 'restaurant' || user.type === 'individual') && React.createElement(
+          'div',
+          { 
+            ref: dropdownRef,
+            style: { position: 'relative', display: 'flex', alignItems: 'center' }
+          },
+          React.createElement(
+            'div',
+            {
+              className: 'notification-bell-container',
+              onClick: () => setDropdownOpen(!dropdownOpen),
+              title: 'Notifications'
+            },
+            React.createElement(Icons.Bell, { size: 20 }),
+            unreadCount > 0 && React.createElement(
+              'span',
+              { className: 'notification-badge' },
+              unreadCount
+            )
+          ),
+          dropdownOpen && React.createElement(
+            'div',
+            { className: 'notification-dropdown glass-panel' },
+            React.createElement(
+              'div',
+              { className: 'notification-dropdown-header' },
+              React.createElement('h4', null, 'Notifications'),
+              unreadCount > 0 && React.createElement(
+                'button',
+                { className: 'btn-mark-all', onClick: () => { markAllAsRead(); } },
+                'Mark all as read'
+              )
+            ),
+            React.createElement(
+              'div',
+              { className: 'notification-list' },
+              notifications.length === 0 ? React.createElement(
+                'div',
+                { className: 'notification-empty' },
+                'No notifications yet'
+              ) : notifications.map(n => React.createElement(
+                'div',
+                {
+                  key: n.id,
+                  className: `notification-item ${n.read ? '' : 'unread'}`,
+                  onClick: () => { if (!n.read) markAsRead(n.id); }
+                },
+                React.createElement(
+                  'span',
+                  { className: 'notification-item-title' },
+                  n.title
+                ),
+                React.createElement(
+                  'span',
+                  { className: 'notification-item-message' },
+                  n.message
+                ),
+                React.createElement(
+                  'span',
+                  { className: 'notification-item-time' },
+                  new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · ' + new Date(n.createdAt).toLocaleDateString()
+                )
+              ))
+            )
+          )
+        ),
         React.createElement(
           'span',
           { className: 'user-badge' },

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { usePosts } from '../../hooks/usePosts';
 import Button from '../common/Button';
 import Card from '../common/Card';
 import Icons from '../common/Icons';
@@ -7,8 +6,17 @@ import Icons from '../common/Icons';
 type MealTime = 'breakfast' | 'lunch' | 'dinner';
 type VenueType = 'cafe' | 'restaurant' | 'fastfood';
 
-export const PostForm: React.FC = () => {
-  const { createPost, loading } = usePosts();
+interface PostFormProps {
+  onCreatePost?: (postData: {
+    portions: number;
+    mealTime: 'breakfast' | 'lunch' | 'dinner';
+    venueType: 'cafe' | 'restaurant' | 'fastfood';
+    seatingCapacity: number;
+  }) => Promise<void>;
+  loading?: boolean;
+}
+
+export const PostForm: React.FC<PostFormProps> = ({ onCreatePost, loading = false }) => {
   const [portions, setPortions] = useState<number>(10);
   const [mealTime, setMealTime] = useState<MealTime>('lunch');
   const [venueType, setVenueType] = useState<VenueType>('restaurant');
@@ -20,12 +28,14 @@ export const PostForm: React.FC = () => {
       alert('Please enter valid portions and seating capacity.');
       return;
     }
-    createPost({
-      portions,
-      mealTime,
-      venueType,
-      seatingCapacity,
-    });
+    if (onCreatePost) {
+      onCreatePost({
+        portions,
+        mealTime,
+        venueType,
+        seatingCapacity,
+      });
+    }
   };
 
   return React.createElement(

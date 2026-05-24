@@ -5,6 +5,7 @@ import authRouter from './routes/auth';
 import postsRouter from './routes/posts';
 import leaderboardRouter from './routes/leaderboard';
 import claimsRouter from './routes/claims';
+import notificationsRouter from './routes/notifications';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/posts', postsRouter);
 app.use('/api/leaderboard', leaderboardRouter);
 app.use('/api/claims', claimsRouter);
+app.use('/api/notifications', notificationsRouter);
 
 // Health check
 app.get('/health', (req, res) => {

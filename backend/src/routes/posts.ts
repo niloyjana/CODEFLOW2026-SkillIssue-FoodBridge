@@ -272,6 +272,20 @@ router.post('/:postId/complete', requireAuth, async (req: AuthenticatedRequest, 
 
     await postRef.update({ status: 'completed' });
 
+    // Create notification for the donor
+    const notificationRef = db.collection('notifications').doc();
+    const newNotification = {
+      id: notificationRef.id,
+      recipientId: postData.restaurantId,
+      title: 'Donation Received! ❤️',
+      message: `Your donation of "${postData.mealTime || 'food'}" has been marked as distributed/delivered to neighbors by ${postData.claimedByName || 'a shelter/volunteer'}.`,
+      type: 'complete',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      read: false,
+      postId: postId,
+    };
+    await notificationRef.set(newNotification);
+
     res.status(200).json(serializeData({
       ...postData,
       id: postId,

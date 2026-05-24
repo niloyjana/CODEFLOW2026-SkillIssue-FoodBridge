@@ -90,6 +90,20 @@ router.post('/individual', requireAuth, async (req: AuthenticatedRequest, res: R
         badges: currentBadges,
       });
 
+      // Create notification for the donor
+      const notificationRef = db.collection('notifications').doc();
+      const newNotification = {
+        id: notificationRef.id,
+        recipientId: postData.restaurantId,
+        title: 'Donation Claimed! 🍱',
+        message: `${userData.name} has claimed 1 portion of your donation: "${postData.mealTime || 'food'}".`,
+        type: 'claim',
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        read: false,
+        postId: postId,
+      };
+      transaction.set(notificationRef, newNotification);
+
       return {
         ...postData,
         ...postUpdates,
@@ -175,6 +189,20 @@ router.post('/bulk', requireAuth, async (req: AuthenticatedRequest, res: Respons
         completedPickups: admin.firestore.FieldValue.increment(1),
         peopleServed: admin.firestore.FieldValue.increment(portions),
       });
+
+      // Create notification for the donor
+      const notificationRef = db.collection('notifications').doc();
+      const newNotification = {
+        id: notificationRef.id,
+        recipientId: postData.restaurantId,
+        title: 'Donation Claimed! 🍱',
+        message: `${userData.name} has claimed ${portions} portions of your donation: "${postData.mealTime || 'food'}".`,
+        type: 'claim',
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        read: false,
+        postId: postId,
+      };
+      transaction.set(notificationRef, newNotification);
 
       return {
         ...postData,

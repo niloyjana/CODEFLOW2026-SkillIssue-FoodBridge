@@ -6,7 +6,7 @@ import IndividualDashboard from '../components/individual/IndividualDashboard';
 
 export const IndividualPage: React.FC = () => {
   const { user } = useAuth();
-  const { posts } = usePosts();
+  const { posts, createPost, loading } = usePosts();
 
   const myPosts = posts.filter(p => p.restaurantId === user?.id);
   const activeCount = myPosts.filter(p => p.status === 'active').length;
@@ -66,7 +66,7 @@ export const IndividualPage: React.FC = () => {
     React.createElement(
       'div',
       { className: 'dashboard-grid mask-reveal delay-2' },
-      React.createElement(PostForm, null),
+      React.createElement(PostForm, { onCreatePost: createPost, loading: loading }),
       React.createElement(IndividualDashboard, null)
     )
   );

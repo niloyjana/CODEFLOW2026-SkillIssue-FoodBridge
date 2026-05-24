@@ -9,4 +9,5 @@ export const ENDPOINTS = {
   claimIndividual: `${API_BASE_URL}/api/claims/individual`,
   claimBulk: `${API_BASE_URL}/api/claims/bulk`,
   auth: `${API_BASE_URL}/api/auth`,
+  notifications: `${API_BASE_URL}/api/notifications`,
 } as const;

@@ -167,6 +167,44 @@ export function openGoogleMapsDirections(
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
+/**
+ * Opens Google Maps directions in a new tab for a multi-stop route.
+ */
+export function openGoogleMapsMultiStopRoute(
+  origin: RoutePoint,
+  stops: RoutePoint[]
+): void {
+  if (stops.length === 0) return;
+
+  // Filter out stops that are extremely close to the origin (less than 5 meters)
+  const activeStops = stops.filter(stop => {
+    const dist = calculateDistance(origin.lat, origin.lng, stop.lat, stop.lng);
+    return dist >= 0.005; // 5 meters
+  });
+
+  // If no stops are left, then they are all at the origin
+  if (activeStops.length === 0) {
+    alert("You are already at all destinations on this route!");
+    return;
+  }
+
+  const originStr = `${origin.lat},${origin.lng}`;
+  const destinationStr = `${activeStops[activeStops.length - 1].lat},${activeStops[activeStops.length - 1].lng}`;
+  
+  let url = `https://www.google.com/maps/dir/?api=1&origin=${originStr}&destination=${destinationStr}`;
+  
+  if (activeStops.length > 1) {
+    const waypoints = activeStops
+      .slice(0, activeStops.length - 1)
+      .map(stop => `${stop.lat},${stop.lng}`)
+      .join('|');
+    url += `&waypoints=${waypoints}`;
+  }
+
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+
 // ── Internals ─────────────────────────────────────────────────────────────────
 
 function straightLineFallback(

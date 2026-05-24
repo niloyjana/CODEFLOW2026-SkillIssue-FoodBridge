@@ -7,7 +7,7 @@ import {
   OptimizationPoint,
   OptimizedRoute,
 } from '../../services/routeOptimization';
-import { openGoogleMapsDirections } from '../../services/routing';
+import { openGoogleMapsMultiStopRoute } from '../../services/routing';
 import { FoodPost } from 'shared/types';
 import Icons from '../common/Icons';
 import Button from '../common/Button';
@@ -66,10 +66,9 @@ export const OptimizedRoutePlanner: React.FC<OptimizedRoutePlannerProps> = ({
 
   const handleStartNavigation = () => {
     if (optimizedRoute.stops.length > 0) {
-      const firstStop = optimizedRoute.stops[0];
-      openGoogleMapsDirections(
+      openGoogleMapsMultiStopRoute(
         { lat: userLat, lng: userLng },
-        { lat: firstStop.lat, lng: firstStop.lng }
+        optimizedRoute.stops
       );
     }
   };

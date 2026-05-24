@@ -217,6 +217,15 @@ export const ShelterPage: React.FC = () => {
                       'div',
                       { className: 'meta-item' },
                       React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
+                        React.createElement(Icons.Calendar, { size: 12 }),
+                        'Posted At'
+                      ),
+                      React.createElement('span', { className: 'meta-value' }, formatDate(post.createdAt))
+                    ),
+                    React.createElement(
+                      'div',
+                      { className: 'meta-item' },
+                      React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
                         React.createElement(Icons.Calendar, { size: 12, color: 'var(--secondary-color)' }),
                         'Pickup By'
                       ),
@@ -315,6 +324,15 @@ export const ShelterPage: React.FC = () => {
                         'Pickup Address'
                       ),
                       React.createElement('span', { className: 'meta-value' }, post.address)
+                    ),
+                    React.createElement(
+                      'div',
+                      { className: 'meta-item' },
+                      React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
+                        React.createElement(Icons.Calendar, { size: 12 }),
+                        'Posted At'
+                      ),
+                      React.createElement('span', { className: 'meta-value' }, formatDate(post.createdAt))
                     ),
                     React.createElement(
                       'div',
