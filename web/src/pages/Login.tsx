@@ -1,9 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { UserType } from 'shared/types';
 import Button from '../components/common/Button';
 import Icons from '../components/common/Icons';
+import '../styles/login.css'; // We will create this for the animations
+
+const AppInput = (props: any) => {
+  const { label, placeholder, icon, ...rest } = props;
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  return (
+    <div className="app-input-container">
+      {label && <label className="app-input-label">{label}</label>}
+      <div className="app-input-wrapper">
+        <input
+          className="app-input"
+          placeholder={placeholder}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+          {...rest}
+        />
+        {isHovering && (
+          <>
+            <div
+              className="app-input-glow-top"
+              style={{
+                background: `radial-gradient(40px circle at ${mousePosition.x}px 0px, var(--primary-color) 0%, transparent 100%)`,
+              }}
+            />
+            <div
+              className="app-input-glow-bottom"
+              style={{
+                background: `radial-gradient(40px circle at ${mousePosition.x}px 2px, var(--primary-color) 0%, transparent 100%)`,
+              }}
+            />
+          </>
+        )}
+        {icon && <div className="app-input-icon">{icon}</div>}
+      </div>
+    </div>
+  );
+};
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
@@ -12,9 +60,19 @@ export const Login: React.FC = () => {
   const [role, setRole] = useState<UserType>('restaurant');
   const [loading, setLoading] = useState(false);
 
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const leftSection = e.currentTarget.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - leftSection.left,
+      y: e.clientY - leftSection.top
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login credentials submitted:', { email, role });
     setLoading(true);
     try {
       await login(email, role);
@@ -22,7 +80,6 @@ export const Login: React.FC = () => {
       else if (role === 'shelter') navigate('/shelter');
       else navigate('/individual');
     } catch (err) {
-      console.error(err);
       alert('Login failed');
     } finally {
       setLoading(false);
@@ -30,7 +87,6 @@ export const Login: React.FC = () => {
   };
 
   const handleQuickLogin = async (selectedRole: UserType, emailAddr: string) => {
-    console.log('Quick login clicked:', { selectedRole, emailAddr });
     setLoading(true);
     try {
       await login(emailAddr, selectedRole);
@@ -38,144 +94,104 @@ export const Login: React.FC = () => {
       else if (selectedRole === 'shelter') navigate('/shelter');
       else navigate('/individual');
     } catch (err) {
-      console.error(err);
       alert('Quick login failed');
     } finally {
       setLoading(false);
     }
   };
 
-  return React.createElement(
-    'div',
-    { className: 'auth-wrapper' },
-    React.createElement(
-      'div',
-      { className: 'auth-card glass-panel hover-lift' },
-      React.createElement(
-        'div',
-        { className: 'auth-header' },
-        React.createElement(Icons.Logo, { size: 48, style: { marginBottom: '0.8rem', filter: 'drop-shadow(0 4px 6px rgba(46,125,50,0.15))' } }),
-        React.createElement('h1', { style: { fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '0.2rem' } }, 'FoodBridge'),
-        React.createElement('h2', { style: { fontSize: '0.9rem', color: 'var(--text-secondary)' } }, 'Welcome Back')
-      ),
-      React.createElement(
-        'form',
-        { onSubmit: handleSubmit },
-        React.createElement(
-          'div',
-          { className: 'auth-toggle-role', style: { display: 'flex', gap: '0.35rem', marginBottom: '1.25rem', background: 'rgba(0,0,0,0.03)', padding: '0.25rem', borderRadius: 'var(--radius-sm)' } },
-          React.createElement(
-            'button',
-            {
-              type: 'button',
-              className: `role-tab ${role === 'restaurant' ? 'active' : ''}`,
-              style: { flex: 1, padding: '0.5rem 0.25rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', border: '0', background: 'transparent', cursor: 'pointer' },
-              onClick: () => setRole('restaurant')
-            },
-            React.createElement(Icons.Utensils, { size: 14 }),
-            'Restaurant'
-          ),
-          React.createElement(
-            'button',
-            {
-              type: 'button',
-              className: `role-tab ${role === 'shelter' ? 'active' : ''}`,
-              style: { flex: 1, padding: '0.5rem 0.25rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', border: '0', background: 'transparent', cursor: 'pointer' },
-              onClick: () => setRole('shelter')
-            },
-            React.createElement(Icons.Award, { size: 14, color: 'var(--secondary-color)' }),
-            'Shelter'
-          ),
-          React.createElement(
-            'button',
-            {
-              type: 'button',
-              className: `role-tab ${role === 'individual' ? 'active' : ''}`,
-              style: { flex: 1, padding: '0.5rem 0.25rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', border: '0', background: 'transparent', cursor: 'pointer' },
-              onClick: () => setRole('individual')
-            },
-            React.createElement(Icons.Heart, { size: 14 }),
-            'Individual'
-          )
-        ),
-        React.createElement(
-          'div',
-          { className: 'form-group' },
-          React.createElement('label', { className: 'form-label', htmlFor: 'email' }, 'Email Address'),
-          React.createElement('input', {
-            id: 'email',
-            type: 'email',
-            className: 'form-control glow-focus',
-            placeholder: role === 'restaurant' ? 'restaurant@foodbridge.com' : role === 'shelter' ? 'shelter@foodbridge.com' : 'individual@foodbridge.com',
-            value: email,
-            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
-            required: true,
-          })
-        ),
-        React.createElement(
-          Button,
-          {
-            type: 'submit',
-            className: 'btn-premium',
-            fullWidth: true,
-            disabled: loading,
-            style: { padding: '0.75rem 1rem', fontSize: '0.95rem', fontWeight: 600 }
-          },
-          loading ? 'Logging In...' : 'Log In'
-        )
-      ),
-      React.createElement(
-        'div',
-        { className: 'mt-2', style: { borderTop: '1px solid var(--border-light)', paddingTop: '1rem' } },
-        React.createElement('p', { className: 'text-center form-label', style: { marginBottom: '0.5rem' } }, 'Quick Demo Logins'),
-        React.createElement(
-          'div',
-          { style: { display: 'flex', gap: '0.5rem' } },
-          React.createElement(
-            Button,
-            {
-              type: 'button',
-              variant: 'secondary',
-              className: 'role-tab',
-              style: { flex: 1, padding: '0.4rem', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' },
-              onClick: () => handleQuickLogin('restaurant', 'restaurant@foodbridge.com')
-            },
-            React.createElement(Icons.Utensils, { size: 11 }),
-            'As Restaurant'
-          ),
-          React.createElement(
-            Button,
-            {
-              type: 'button',
-              variant: 'secondary',
-              className: 'role-tab',
-              style: { flex: 1, padding: '0.4rem', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' },
-              onClick: () => handleQuickLogin('shelter', 'shelter@foodbridge.com')
-            },
-            React.createElement(Icons.Award, { size: 11, color: 'var(--secondary-color)' }),
-            'As Shelter'
-          ),
-          React.createElement(
-            Button,
-            {
-              type: 'button',
-              variant: 'secondary',
-              className: 'role-tab',
-              style: { flex: 1, padding: '0.4rem', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' },
-              onClick: () => handleQuickLogin('individual', 'individual@foodbridge.com')
-            },
-            React.createElement(Icons.Heart, { size: 11 }),
-            'As Individual'
-          )
-        )
-      ),
-      React.createElement(
-        'div',
-        { className: 'auth-footer' },
-        "Don't have an account? ",
-        React.createElement('a', { href: '/register', style: { color: 'var(--primary-color)', fontWeight: '600', textDecoration: 'none' } }, 'Register here')
-      )
-    )
+  return (
+    <>
+      <div 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundImage: "url('/bg.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          zIndex: -1
+        }}
+      />
+      <div className="login-page-wrapper">
+        <div className="login-card-container">
+        <div 
+          className="login-left-section"
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          <div
+            className={`login-cursor-glow ${isHovering ? 'active' : ''}`}
+            style={{
+              transform: `translate(${mousePosition.x - 250}px, ${mousePosition.y - 250}px)`
+            }}
+          />
+          <div className="login-form-container">
+            <form onSubmit={handleSubmit} className="login-form">
+              <div className="login-header">
+                <img src="/logo.png" alt="FoodBridge Logo" className="login-logo" />
+                <h2 className="login-subtitle">Welcome Back</h2>
+              </div>
+              
+              <div className="auth-toggle-role login-role-toggle">
+                <button type="button" className={`role-tab ${role === 'restaurant' ? 'active' : ''}`} onClick={() => setRole('restaurant')}>
+                  <Icons.Utensils size={14} /> Restaurant
+                </button>
+                <button type="button" className={`role-tab ${role === 'shelter' ? 'active' : ''}`} onClick={() => setRole('shelter')}>
+                  <Icons.Award size={14} color="var(--secondary-color)" /> Shelter
+                </button>
+                <button type="button" className={`role-tab ${role === 'individual' ? 'active' : ''}`} onClick={() => setRole('individual')}>
+                  <Icons.Heart size={14} /> Individual
+                </button>
+              </div>
+
+              <div className="login-inputs">
+                <AppInput 
+                  placeholder={role === 'restaurant' ? 'restaurant@foodbridge.com' : role === 'shelter' ? 'shelter@foodbridge.com' : 'individual@foodbridge.com'}
+                  type="email" 
+                  value={email}
+                  onChange={(e: any) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="login-actions">
+                <button type="submit" disabled={loading} className="login-submit-btn group">
+                  <span className="login-btn-text">{loading ? 'Logging In...' : 'Log In'}</span>
+                  <div className="login-btn-shine">
+                    <div className="login-btn-shine-bar" />
+                  </div>
+                </button>
+              </div>
+
+              <div className="login-quick-demo">
+                <p>Quick Demo Logins</p>
+                <div className="quick-demo-buttons">
+                  <Button type="button" variant="secondary" onClick={() => handleQuickLogin('restaurant', 'restaurant@foodbridge.com')}>
+                    <Icons.Utensils size={11} />
+                  </Button>
+                  <Button type="button" variant="secondary" onClick={() => handleQuickLogin('shelter', 'shelter@foodbridge.com')}>
+                    <Icons.Award size={11} color="var(--secondary-color)" />
+                  </Button>
+                  <Button type="button" variant="secondary" onClick={() => handleQuickLogin('individual', 'individual@foodbridge.com')}>
+                    <Icons.Heart size={11} />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="auth-footer">
+                Don't have an account? <a href="/register" className="login-link">Register here</a>
+              </div>
+            </form>
+          </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
+
 export default Login;

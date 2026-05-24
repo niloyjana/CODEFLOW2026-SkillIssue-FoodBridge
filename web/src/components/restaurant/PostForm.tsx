@@ -119,7 +119,7 @@ export const PostForm: React.FC<PostFormProps> = ({ onCreatePost, loading = fals
           style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.65rem 1rem' }
         },
         React.createElement(Icons.Plus, { size: 18 }),
-        loading ? 'Analyzing Waste & Posting...' : 'Post surplus with AI prediction'
+        loading ? 'Analyzing Waste & Posting...' : 'Post Surplus with AI Prediction'
       )
     )
   );

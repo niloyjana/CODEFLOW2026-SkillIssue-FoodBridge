@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 import { UserType } from '../types';
 import { Colors, Spacing, Radius, FontSize, FontWeight, Shadow } from '../theme';
@@ -38,7 +38,11 @@ export default function RegisterScreen({ navigation }: any) {
   return (
     <KeyboardAvoidingView style={s.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <View style={s.logo}><Text style={{ fontSize: 48 }}>🌉</Text><Text style={s.title}>FoodBridge</Text><Text style={s.sub}>Create Account</Text></View>
+        <View style={s.logo}>
+          <Image source={require('../../assets/logo.png')} style={{ width: 120, height: 120, resizeMode: 'contain', marginBottom: 10 }} />
+          <Text style={s.title}>FoodBridge</Text>
+          <Text style={s.sub}>Create Account</Text>
+        </View>
         <View style={s.card}>
           <View style={s.tabs}>
             {ROLES.map(r => (

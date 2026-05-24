@@ -47,10 +47,12 @@ export const Navbar: React.FC = () => {
     { className: 'navbar nav-mask-reveal' },
     React.createElement(
       NavLink,
-      { to: '/', className: 'navbar-brand' },
-      React.createElement(Icons.Logo, { size: 28, style: { marginRight: '0.4rem', filter: 'drop-shadow(0 2px 4px rgba(46,125,50,0.25))' } }),
-      'Food',
-      React.createElement('span', null, 'Bridge')
+      { to: '/', className: 'navbar-brand', style: { padding: 0 } },
+      React.createElement('img', { 
+        src: '/logo.png', 
+        alt: 'FoodBridge', 
+        style: { height: '80px', objectFit: 'contain' } 
+      })
     ),
     React.createElement(
       'div',

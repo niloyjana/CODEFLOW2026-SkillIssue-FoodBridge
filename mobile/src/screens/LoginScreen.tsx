@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Image,
 } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 import { UserType } from '../types';
@@ -70,7 +71,7 @@ export default function LoginScreen({ navigation }: any) {
       >
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logoEmoji}>🌉</Text>
+          <Image source={require('../../assets/logo.png')} style={{ width: 120, height: 120, resizeMode: 'contain', marginBottom: 10 }} />
           <Text style={styles.logoTitle}>FoodBridge</Text>
           <Text style={styles.logoSubtitle}>Welcome Back</Text>
         </View>
