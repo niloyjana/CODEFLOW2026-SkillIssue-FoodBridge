@@ -11,12 +11,14 @@ app = Flask(__name__)
 CORS(app) # Allow CORS for frontend integration
 
 MODEL_PATH = 'waste_model.pkl'
-UPLOAD_FOLDER = 'uploads'
+# Use /tmp for serverless environments (Vercel)
+UPLOAD_FOLDER = '/tmp/uploads' if os.environ.get('VERCEL') else 'uploads'
+MODELS_FOLDER = '/tmp/models' if os.environ.get('VERCEL') else 'models'
 ALLOWED_EXTENSIONS = {'csv'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs('models', exist_ok=True)
+os.makedirs(MODELS_FOLDER, exist_ok=True)
 
 # Load model globally if it exists
 model = None
@@ -29,6 +31,7 @@ else:
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.route('/api/ai/upload-sales', methods=['POST'])
 @app.route('/upload-sales', methods=['POST'])
 def upload_sales():
     """Upload CSV file with sales history"""
@@ -72,6 +75,7 @@ def upload_sales():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+@app.route('/api/ai/train-model', methods=['POST'])
 @app.route('/train-model', methods=['POST'])
 def train_model_endpoint():
     """Train AI model on uploaded sales data"""
@@ -116,7 +120,7 @@ def train_model_endpoint():
             'training_rows': len(df)
         }
         
-        model_out_path = f'models/{restaurant_id}_model.pkl'
+        model_out_path = os.path.join(MODELS_FOLDER, f'{restaurant_id}_model.pkl')
         joblib.dump(model_data, model_out_path)
         
         # Calculate actual training accuracy based on MAPE (Mean Absolute Percentage Error)
@@ -146,6 +150,7 @@ def train_model_endpoint():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+@app.route('/api/ai/predict', methods=['POST'])
 @app.route('/predict', methods=['POST'])
 def predict_waste():
     global model
@@ -165,7 +170,7 @@ def predict_waste():
         is_weekend = 1 if today >= 5 else 0
         
         # Check if restaurant has a customized model
-        custom_model_path = f'models/{restaurant_id}_model.pkl' if restaurant_id else None
+        custom_model_path = os.path.join(MODELS_FOLDER, f'{restaurant_id}_model.pkl') if restaurant_id else None
         
         if custom_model_path and os.path.exists(custom_model_path):
             print(f"Using customized model for restaurant {restaurant_id}")
@@ -241,13 +246,14 @@ def predict_waste():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+@app.route('/api/ai/health', methods=['GET'])
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({
         'status': 'ok',
         'global_model_loaded': model is not None,
-        'uploads_count': len(glob.glob('uploads/*.csv')),
-        'custom_models_count': len(glob.glob('models/*.pkl'))
+        'uploads_count': len(glob.glob(os.path.join(UPLOAD_FOLDER, '*.csv'))),
+        'custom_models_count': len(glob.glob(os.path.join(MODELS_FOLDER, '*.pkl')))
     })
 
 if __name__ == '__main__':

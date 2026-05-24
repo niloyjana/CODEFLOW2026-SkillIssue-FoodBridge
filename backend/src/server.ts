@@ -33,7 +33,11 @@ app.get('/', (req, res) => {
   res.send('FoodShare API Server is running.');
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`[Server] Running on http://localhost:${PORT}`);
-});
+// Start Server only if not running in Vercel serverless environment
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`[Server] Running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;

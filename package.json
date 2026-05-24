@@ -1,0 +1,7 @@
+{
+  "name": "foodbridge-root",
+  "private": true,
+  "scripts": {
+    "vercel-build": "npm --prefix backend install && npm --prefix backend run build && npm --prefix web install && npm --prefix web run build"
+  }
+}
