@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, RefreshControl, Linking } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 import { usePosts } from '../hooks/usePosts';
 import { useLeaderboard } from '../hooks/useLeaderboard';
@@ -35,6 +35,28 @@ export default function ShelterScreen() {
           ].map((st, i) => (
             <View key={i} style={s.statBox}><Text style={[s.statVal, { color: st.c }]}>{st.v}</Text><Text style={s.statLbl}>{st.l}</Text></View>
           ))}
+        </View>
+      </View>
+
+      {/* ── Nearby Restaurants Map (matches web ShelterPage) ── */}
+      <View style={s.mapCard}>
+        <View style={s.mapHeader}>
+          <Text style={{ fontSize: 18 }}>📍</Text>
+          <Text style={s.mapHeaderTitle}>Nearby Restaurants</Text>
+        </View>
+        <View style={s.mapPlaceholder}>
+          <Text style={{ fontSize: 40, marginBottom: 8 }}>🗺️</Text>
+          <Text style={s.mapPlaceholderTitle}>Map View</Text>
+          <Text style={s.mapPlaceholderSub}>
+            View nearby restaurants and food posts on the web dashboard for the full interactive map experience.
+          </Text>
+          <TouchableOpacity
+            style={s.mapOpenBtn}
+            onPress={() => Linking.openURL('https://www.openstreetmap.org/')}
+            activeOpacity={0.7}
+          >
+            <Text style={s.mapOpenBtnText}>🌐 Open Map in Browser</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -138,4 +160,58 @@ const s = StyleSheet.create({
   completeBtn: { backgroundColor: 'rgba(46,125,50,0.08)', borderWidth: 1, borderColor: Colors.border, borderRadius: Radius.sm, paddingVertical: 12, alignItems: 'center', marginTop: Spacing.md },
   completeBtnText: { color: Colors.primary, fontWeight: FontWeight.bold, fontSize: FontSize.sm },
   completedText: { color: Colors.primary, fontWeight: FontWeight.semibold, fontSize: FontSize.sm, marginTop: Spacing.md },
+  // ── Map ──
+  mapCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    padding: Spacing.xl,
+    marginBottom: Spacing.xl,
+    ...Shadow.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  mapHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: Spacing.lg,
+  },
+  mapHeaderTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+  },
+  mapPlaceholder: {
+    alignItems: 'center',
+    padding: Spacing.xl,
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+  },
+  mapPlaceholderTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    color: Colors.textPrimary,
+    marginBottom: 4,
+  },
+  mapPlaceholderSub: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: Spacing.md,
+  },
+  mapOpenBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: Radius.sm,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    ...Shadow.sm,
+  },
+  mapOpenBtnText: {
+    color: '#FFF',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+  },
 });
