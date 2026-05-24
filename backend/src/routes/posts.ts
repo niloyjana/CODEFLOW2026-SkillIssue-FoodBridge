@@ -87,11 +87,35 @@ router.post('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =
       return;
     }
 
-    // AI Prediction simulation formula
-    const portionsFactor = portions * 0.18;
-    const capacityFactor = (seatingCapacity / 100) * (mealTime === 'dinner' ? 1.4 : 0.8);
-    const venueFactor = venueType === 'fastfood' ? 0.9 : venueType === 'restaurant' ? 0.5 : 0.2;
-    const predictedWasteKg = Math.max(0.5, parseFloat((portionsFactor + capacityFactor + venueFactor).toFixed(2)));
+    // Call local AI service for waste prediction
+    let predictedWasteKg = 0;
+    try {
+      const aiResponse = await fetch('http://127.0.0.1:5001/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          portions,
+          seatingCapacity,
+          mealTime,
+          venueType
+        })
+      });
+      
+      if (aiResponse.ok) {
+        const aiData = await aiResponse.json();
+        predictedWasteKg = aiData.predictedWasteKg || 0;
+      } else {
+        console.error('AI service returned error:', await aiResponse.text());
+        // Fallback formula if AI is down
+        predictedWasteKg = Math.max(0.5, portions * 0.18); 
+      }
+    } catch (aiErr) {
+      console.error('Failed to connect to AI service:', aiErr);
+      // Fallback formula if AI is down
+      predictedWasteKg = Math.max(0.5, portions * 0.18); 
+    }
 
     const pickupTime = new Date();
     pickupTime.setHours(pickupTime.getHours() + 4);

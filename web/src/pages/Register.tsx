@@ -112,9 +112,8 @@ export const Register: React.FC = () => {
       React.createElement(
         'div',
         { className: 'auth-header' },
-        React.createElement(Icons.Logo, { size: 48, style: { marginBottom: '0.8rem', filter: 'drop-shadow(0 4px 6px rgba(46,125,50,0.15))' } }),
-        React.createElement('h1', { style: { fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '0.2rem' } }, 'FoodBridge'),
-        React.createElement('h2', { style: { fontSize: '0.9rem', color: 'var(--text-secondary)' } }, 'Create Account')
+        React.createElement('img', { src: '/logo.png', alt: 'FoodBridge Logo', style: { height: '140px', objectFit: 'contain', marginBottom: '0.5rem' } }),
+        React.createElement('h2', { style: { fontSize: '1rem', color: 'var(--text-secondary)' } }, 'Create Account')
       ),
       React.createElement(
         'form',
