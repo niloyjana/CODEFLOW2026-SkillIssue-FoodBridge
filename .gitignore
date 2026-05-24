@@ -38,3 +38,8 @@ web/src/shared/
 
 # Firebase credentials
 backend/serviceAccountKey.json
+
+# AI model binaries (too large for git)
+ai/*.pkl
+ai/*.joblib
+ai/*.h5
