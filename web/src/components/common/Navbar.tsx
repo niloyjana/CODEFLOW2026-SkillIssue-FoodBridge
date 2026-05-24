@@ -45,13 +45,21 @@ export const Navbar: React.FC = () => {
         },
         'Dashboard'
       ),
+      user && user.type === 'shelter' && React.createElement(
+        NavLink,
+        {
+          to: '/shelter',
+          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
+        },
+        'Available Food'
+      ),
       user && user.type === 'individual' && React.createElement(
         NavLink,
         {
           to: '/individual',
           className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`
         },
-        'Dashboard'
+        'Donate Food'
       ),
       React.createElement(
         NavLink,

@@ -72,6 +72,50 @@ export const usePosts = () => {
     }
   };
 
+  const claimBulkOrder = async (postId: string, portions: number) => {
+    if (!user) {
+      setError('User session not found');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const updatedPost = await apiService.claimBulkOrder(postId, portions, user);
+      setPosts((prev) =>
+        prev.map((post) => (post.id === postId ? updatedPost : post))
+      );
+      refreshSession();
+      alert(`Claimed: Successfully claimed ${portions} portions from ${updatedPost.restaurantName}!`);
+    } catch (e: any) {
+      setError(e.message || 'Failed to claim bulk order');
+      alert(`Error claiming bulk order: ${e.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const completePost = async (postId: string) => {
+    if (!user) {
+      setError('User session not found');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const updatedPost = await apiService.completePost(postId, user);
+      setPosts((prev) =>
+        prev.map((post) => (post.id === postId ? updatedPost : post))
+      );
+      refreshSession();
+      alert(`Completed: Order from ${updatedPost.restaurantName} marked as completed/distributed!`);
+    } catch (e: any) {
+      setError(e.message || 'Failed to complete order');
+      alert(`Error completing order: ${e.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
@@ -83,5 +127,8 @@ export const usePosts = () => {
     fetchPosts,
     createPost,
     claimPost,
+    claimBulkOrder,
+    completePost,
   };
 };
+export default usePosts;

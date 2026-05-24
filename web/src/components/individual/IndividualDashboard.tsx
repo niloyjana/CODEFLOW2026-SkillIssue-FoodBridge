@@ -6,11 +6,15 @@ import Card from '../common/Card';
 import Icons from '../common/Icons';
 
 export const IndividualDashboard: React.FC = () => {
-  const { posts } = usePosts();
+  const { posts, loading } = usePosts();
   const { user } = useAuth();
 
-  // Filter posts claimed by the current individual
-  const claimedPosts = posts.filter((post) => post.claimedBy === user?.id);
+  // Filter posts created by the current individual volunteer
+  const myPosts = posts.filter((post) => post.restaurantId === user?.id);
+
+  if (loading && myPosts.length === 0) {
+    return React.createElement('div', { className: 'text-center' }, 'Loading dashboard...');
+  }
 
   return React.createElement(
     'div',
@@ -56,76 +60,75 @@ export const IndividualDashboard: React.FC = () => {
         React.createElement(
           'div',
           { className: 'flex gap-1', style: { flexWrap: 'wrap' } },
-          claimedPosts.length >= 15 && React.createElement('span', { className: 'badge', style: { backgroundColor: '#ffd700', color: '#5d4037' } }, '🏆 Surplus Savior'),
-          claimedPosts.length >= 10 && React.createElement('span', { className: 'badge', style: { backgroundColor: '#c0c0c0', color: '#333' } }, '🥇 Community Hero'),
-          claimedPosts.length >= 5 && React.createElement('span', { className: 'badge', style: { backgroundColor: '#cd7f32', color: '#fff' } }, '🥈 Consistent Packer'),
-          claimedPosts.length > 0 && React.createElement('span', { className: 'badge badge-active' }, '🌟 First Step'),
-          claimedPosts.length === 0 && React.createElement('span', { style: { fontSize: '0.85rem', color: 'var(--text-light)', fontStyle: 'italic' } }, 'Claim a pickup to earn badges!')
+          myPosts.length >= 15 && React.createElement('span', { className: 'badge', style: { backgroundColor: '#ffd700', color: '#5d4037' } }, '🏆 Surplus Savior'),
+          myPosts.length >= 10 && React.createElement('span', { className: 'badge', style: { backgroundColor: '#c0c0c0', color: '#333' } }, '🥇 Community Hero'),
+          myPosts.length >= 5 && React.createElement('span', { className: 'badge', style: { backgroundColor: '#cd7f32', color: '#fff' } }, '🥈 Consistent Packer'),
+          myPosts.length > 0 && React.createElement('span', { className: 'badge badge-active' }, '🌟 First Step'),
+          myPosts.length === 0 && React.createElement('span', { style: { fontSize: '0.85rem', color: 'var(--text-light)', fontStyle: 'italic' } }, 'Post a donation to earn badges!')
         )
       )
     ),
-    React.createElement('h3', { className: 'mt-2 mb-2' }, 'Your Claimed Pickups'),
-    claimedPosts.length === 0
+    React.createElement('h3', { className: 'mt-2 mb-2' }, 'Your Excess Food Posts'),
+    myPosts.length === 0
       ? React.createElement(
           Card,
           null,
-          React.createElement('p', { className: 'text-center', style: { color: 'var(--text-secondary)' } }, 'You have not claimed any pickups yet. Browse active posts on the right!')
+          React.createElement('p', { className: 'text-center', style: { color: 'var(--text-secondary)' } }, 'You have not posted any food donations yet. Use the form above to submit one!')
         )
       : React.createElement(
           'div',
           { className: 'posts-list' },
-          claimedPosts.map((post) =>
+          myPosts.map((post) =>
             React.createElement(
               'div',
-              { key: post.id, className: 'card post-card glass-panel hover-lift claimed' },
+              { key: post.id, className: `card post-card glass-panel hover-lift ${post.status === 'claimed' ? 'claimed' : ''}` },
               React.createElement(
                 'div',
                 { className: 'flex justify-between align-center' },
                 React.createElement('h4', { style: { display: 'inline-flex', alignItems: 'center', gap: '0.4rem' } }, 
                   React.createElement(Icons.Utensils, { size: 16, color: 'var(--primary-color)' }),
-                  post.restaurantName
+                  formatPortions(post.portions)
                 ),
                 React.createElement(
                   'span',
-                  { className: 'badge badge-claimed' },
+                  { className: `badge badge-${post.status}` },
                   post.status.toUpperCase()
                 )
               ),
               React.createElement(
-                'p',
-                { style: { margin: '0.5rem 0', fontWeight: '600' } },
-                formatPortions(post.portions)
-              ),
-              React.createElement(
                 'div',
                 { className: 'post-meta-grid' },
-                post.address && React.createElement(
-                  'div',
-                  { className: 'meta-item', style: { gridColumn: 'span 2' } },
-                  React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
-                    React.createElement(Icons.MapPin, { size: 12 }),
-                    'Pickup Address'
-                  ),
-                  React.createElement('span', { className: 'meta-value' }, post.address)
-                ),
                 React.createElement(
                   'div',
                   { className: 'meta-item' },
                   React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
                     React.createElement(Icons.Calendar, { size: 12 }),
-                    'Pickup Deadline'
+                    'Posted At'
                   ),
-                  React.createElement('span', { className: 'meta-value' }, formatDate(post.pickupBy))
+                  React.createElement('span', { className: 'meta-value' }, formatDate(post.createdAt))
                 ),
                 React.createElement(
                   'div',
                   { className: 'meta-item' },
                   React.createElement('span', { className: 'meta-label', style: { display: 'flex', alignItems: 'center', gap: '0.2rem' } }, 
-                    React.createElement(Icons.Leaf, { size: 12, color: 'var(--primary-color)' }),
-                    'Waste Saved'
+                    React.createElement(Icons.Calendar, { size: 12, color: 'var(--secondary-color)' }),
+                    'Pickup By'
                   ),
-                  React.createElement('span', { className: 'meta-value', style: { color: 'var(--primary-color)', fontWeight: '600' } }, formatWaste(post.predictedWasteKg))
+                  React.createElement('span', { className: 'meta-value', style: { color: 'var(--secondary-color)' } }, formatDate(post.pickupBy))
                 )
+              ),
+              React.createElement(
+                'div',
+                { className: 'waste-alert', style: { display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(76, 175, 80, 0.08)', border: '1px solid rgba(76, 175, 80, 0.15)', borderRadius: 'var(--radius-sm)' } },
+                React.createElement(Icons.Leaf, { size: 16, color: 'var(--primary-color)' }),
+                React.createElement('span', { className: 'waste-label', style: { flex: 1 } }, 'AI Waste Prediction Avoided:'),
+                React.createElement('span', { className: 'waste-value', style: { fontWeight: '700', color: 'var(--primary-color)' } }, formatWaste(post.predictedWasteKg))
+              ),
+              post.status === 'claimed' && React.createElement(
+                'p',
+                { style: { fontSize: '0.85rem', color: 'var(--secondary-color)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.6rem' } },
+                React.createElement(Icons.CheckCircle, { size: 14 }),
+                post.claimedByName ? `Claimed by ${post.claimedByName} shelter.` : 'Claimed by a shelter and scheduled for pickup.'
               )
             )
           )
@@ -133,7 +136,6 @@ export const IndividualDashboard: React.FC = () => {
   );
 };
 
-// Internal formatting utility for local mapping inside components if not loaded
 const formatWaste = (kg: number): string => `${kg.toFixed(1)} kg`;
 
 export default IndividualDashboard;

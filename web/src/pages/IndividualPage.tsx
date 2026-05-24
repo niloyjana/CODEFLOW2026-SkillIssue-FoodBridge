@@ -1,16 +1,16 @@
 import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { usePosts } from '../hooks/usePosts';
+import PostForm from '../components/restaurant/PostForm';
 import IndividualDashboard from '../components/individual/IndividualDashboard';
-import AvailablePosts from '../components/individual/AvailablePosts';
 
 export const IndividualPage: React.FC = () => {
   const { user } = useAuth();
   const { posts } = usePosts();
 
-  const claimedPosts = posts.filter(p => p.claimedBy === user?.id);
-  const activePickups = claimedPosts.filter(p => p.status === 'claimed').length;
-  const totalWasteSaved = claimedPosts.reduce((acc, p) => acc + p.predictedWasteKg, 0);
+  const myPosts = posts.filter(p => p.restaurantId === user?.id);
+  const activeCount = myPosts.filter(p => p.status === 'active').length;
+  const totalWasteSaved = myPosts.reduce((acc, p) => acc + p.predictedWasteKg, 0);
 
   return React.createElement(
     'div',
@@ -37,7 +37,7 @@ export const IndividualPage: React.FC = () => {
         'div',
         null,
         React.createElement('h1', { style: { fontFamily: 'var(--font-heading)', color: 'var(--primary-color)', fontSize: '2rem', marginBottom: '0.2rem' } }, `Welcome back, ${user?.name || 'Volunteer Partner'}!`),
-        React.createElement('p', { style: { color: 'var(--text-secondary)', fontSize: '0.95rem' } }, 'Coordinate claimed pickups and review your community impact metrics.')
+        React.createElement('p', { style: { color: 'var(--text-secondary)', fontSize: '0.95rem' } }, 'Publish surplus food donations, earn impact badges, and track your community support.')
       ),
       React.createElement(
         'div',
@@ -45,8 +45,8 @@ export const IndividualPage: React.FC = () => {
         React.createElement(
           'div',
           { style: { textAlign: 'center', minWidth: '95px', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(76,175,80,0.1)' } },
-          React.createElement('span', { style: { fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem', fontWeight: 600 } }, 'Active Pickups'),
-          React.createElement('span', { style: { fontSize: '1.35rem', fontWeight: '800', color: 'var(--primary-color)' } }, activePickups)
+          React.createElement('span', { style: { fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem', fontWeight: 600 } }, 'Active Posts'),
+          React.createElement('span', { style: { fontSize: '1.35rem', fontWeight: '800', color: 'var(--primary-color)' } }, activeCount)
         ),
         React.createElement(
           'div',
@@ -62,14 +62,14 @@ export const IndividualPage: React.FC = () => {
         )
       )
     ),
+
     React.createElement(
       'div',
       { className: 'dashboard-grid mask-reveal delay-2' },
-      React.createElement(IndividualDashboard, null),
-      React.createElement(AvailablePosts, null)
+      React.createElement(PostForm, null),
+      React.createElement(IndividualDashboard, null)
     )
   );
 };
 
 export default IndividualPage;
-

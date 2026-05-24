@@ -1,11 +1,16 @@
 import axios from 'axios';
-import { FoodPost, LeaderboardEntry, User, UserType, Claim } from 'shared/types';
+import { FoodPost, LeaderboardEntry, User, UserType } from 'shared/types';
 import { ENDPOINTS } from 'shared/constants/endpoints';
 import { auth as firebaseAuth } from '../config/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 
+import { MOCK_POSTS, MOCK_LEADERBOARD } from './mockData';
+
 // Toggle for switching between mock simulation and actual API calls
 export const MOCK_MODE = false;
+
+let mockPostsInMemory = [...MOCK_POSTS];
+let mockLeaderboardInMemory = [...MOCK_LEADERBOARD];
 
 const STORAGE_KEYS = {
   SESSION: 'foodbridge_session',
@@ -24,15 +29,12 @@ const getAuthHeaders = async () => {
 export const apiService = {
   // Authentication
   login: async (email: string, type: UserType): Promise<User> => {
-    // Generate a consistent dummy password for email-only hackathon logins
     const password = `${email.split('@')[0]}FB123!`;
 
     if (!MOCK_MODE) {
-      // 1. Authenticate with Firebase Auth Client SDK
       const credential = await signInWithEmailAndPassword(firebaseAuth, email, password);
       const idToken = await credential.user.getIdToken();
 
-      // 2. Query/validate profile from the backend
       const response = await axios.post(
         `${ENDPOINTS.auth}/login`,
         { email, type },
@@ -44,7 +46,6 @@ export const apiService = {
       return user;
     }
 
-    // Mock implementation fallback (unused in production)
     console.log(`API Call to ${ENDPOINTS.auth}/login (MOCK):`, { email, type });
     await new Promise((resolve) => setTimeout(resolve, 500));
     const user: User = {
@@ -59,19 +60,16 @@ export const apiService = {
     return user;
   },
 
-  register: async (name: string, email: string, type: UserType): Promise<User> => {
-    // Generate a consistent dummy password for email-only hackathon logins
+  register: async (name: string, email: string, type: UserType, extraFields?: any): Promise<User> => {
     const password = `${email.split('@')[0]}FB123!`;
 
     if (!MOCK_MODE) {
-      // 1. Create account with Firebase Auth Client SDK
       const credential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
       const idToken = await credential.user.getIdToken();
 
-      // 2. Initialize profile database document on the backend
       const response = await axios.post(
         `${ENDPOINTS.auth}/register`,
-        { name, email, type },
+        { name, email, type, ...extraFields },
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
       
@@ -80,8 +78,7 @@ export const apiService = {
       return user;
     }
 
-    // Mock implementation fallback (unused in production)
-    console.log(`API Call to ${ENDPOINTS.auth}/register (MOCK):`, { name, email, type });
+    console.log(`API Call to ${ENDPOINTS.auth}/register (MOCK):`, { name, email, type, ...extraFields });
     await new Promise((resolve) => setTimeout(resolve, 500));
     const user: User = {
       id: `mock_user`,
@@ -90,6 +87,7 @@ export const apiService = {
       type,
       points: 0,
       createdAt: new Date().toISOString(),
+      ...extraFields
     };
     localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(user));
     return user;
@@ -122,7 +120,18 @@ export const apiService = {
       const response = await axios.get(ENDPOINTS.posts, { params, headers });
       return response.data;
     }
-    return [];
+    
+    let result = [...mockPostsInMemory];
+    if (params?.status) {
+      result = result.filter(p => p.status === params.status);
+    }
+    if (params?.restaurantId) {
+      result = result.filter(p => p.restaurantId === params.restaurantId);
+    }
+    if (params?.userId) {
+      result = result.filter(p => p.claimedBy === params.userId);
+    }
+    return result;
   },
 
   createPost: async (postData: {
@@ -137,26 +146,121 @@ export const apiService = {
       const response = await axios.post(ENDPOINTS.posts, postData, { headers });
       return response.data;
     }
-    throw new Error('Mock mode is disabled');
+
+    const newPost: FoodPost = {
+      id: `mock_post_${Date.now()}`,
+      restaurantId: postData.currentUser.id,
+      restaurantName: postData.currentUser.name,
+      portions: postData.portions,
+      predictedWasteKg: parseFloat((postData.portions * 0.22).toFixed(1)),
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      pickupBy: new Date(Date.now() + 7200000).toISOString(),
+      address: postData.currentUser.address,
+      lat: postData.currentUser.lat,
+      lng: postData.currentUser.lng,
+    };
+    
+    mockPostsInMemory.unshift(newPost);
+    return newPost;
   },
 
   claimPost: async (postId: string, currentUser: User): Promise<FoodPost> => {
     if (!MOCK_MODE) {
       const headers = await getAuthHeaders();
-      const response = await axios.post(ENDPOINTS.claim, { postId, userId: currentUser.id }, { headers });
+      const response = await axios.post(ENDPOINTS.claimIndividual, { postId, userId: currentUser.id }, { headers });
       return response.data;
     }
-    throw new Error('Mock mode is disabled');
+
+    const postIdx = mockPostsInMemory.findIndex(p => p.id === postId);
+    if (postIdx === -1) throw new Error('Post not found');
+    const post = mockPostsInMemory[postIdx];
+    if (post.status !== 'active' || post.portions < 1) throw new Error('No portions available');
+    
+    const updated = {
+      ...post,
+      portions: post.portions - 1,
+      status: (post.portions - 1 === 0) ? 'claimed' as const : 'active' as const,
+      claimedBy: (post.portions - 1 === 0) ? currentUser.id : undefined,
+      claimedByName: (post.portions - 1 === 0) ? currentUser.name : undefined,
+    };
+    mockPostsInMemory[postIdx] = updated;
+    
+    currentUser.points += 10;
+    localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(currentUser));
+    
+    return updated;
+  },
+
+  claimBulkOrder: async (postId: string, portions: number, currentUser: User): Promise<FoodPost> => {
+    if (!MOCK_MODE) {
+      const headers = await getAuthHeaders();
+      const response = await axios.post(
+        ENDPOINTS.claimBulk,
+        { postId, userId: currentUser.id, portions },
+        { headers }
+      );
+      return response.data;
+    }
+
+    const postIdx = mockPostsInMemory.findIndex(p => p.id === postId);
+    if (postIdx === -1) throw new Error('Post not found');
+    const post = mockPostsInMemory[postIdx];
+    if (post.status !== 'active' || post.portions < portions) throw new Error('Not enough portions available');
+    
+    const updated = {
+      ...post,
+      portions: post.portions - portions,
+      status: (post.portions - portions === 0) ? 'claimed' as const : 'active' as const,
+      claimedBy: currentUser.id,
+      claimedByName: currentUser.name,
+    };
+    mockPostsInMemory[postIdx] = updated;
+    
+    currentUser.points += portions * 5;
+    currentUser.peopleServed = (currentUser.peopleServed || 0) + portions;
+    localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(currentUser));
+    
+    return updated;
+  },
+
+  completePost: async (postId: string, currentUser: User): Promise<FoodPost> => {
+    if (!MOCK_MODE) {
+      const headers = await getAuthHeaders();
+      const response = await axios.post(
+        `${ENDPOINTS.posts}/${postId}/complete`,
+        { userId: currentUser.id },
+        { headers }
+      );
+      return response.data;
+    }
+
+    const postIdx = mockPostsInMemory.findIndex(p => p.id === postId);
+    if (postIdx === -1) throw new Error('Post not found');
+    const post = mockPostsInMemory[postIdx];
+    
+    const updated = {
+      ...post,
+      status: 'completed' as const,
+    };
+    mockPostsInMemory[postIdx] = updated;
+    return updated;
   },
 
   // Leaderboard
-  getLeaderboard: async (type?: 'restaurants' | 'individuals'): Promise<LeaderboardEntry[]> => {
+  getLeaderboard: async (type?: 'restaurants' | 'shelters' | 'individuals'): Promise<LeaderboardEntry[]> => {
     if (!MOCK_MODE) {
       const headers = await getAuthHeaders();
       const response = await axios.get(ENDPOINTS.leaderboard, { params: { type }, headers });
       return response.data;
     }
-    return [];
+
+    let result = [...mockLeaderboardInMemory];
+    if (type) {
+      const filterType = type === 'restaurants' ? 'restaurant' : type === 'shelters' ? 'shelter' : 'individual';
+      result = result.filter(e => e.userType === filterType);
+    }
+    return result.sort((a, b) => b.points - a.points);
   },
 };
 

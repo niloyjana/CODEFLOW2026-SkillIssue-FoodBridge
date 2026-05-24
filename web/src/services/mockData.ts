@@ -70,7 +70,38 @@ export const MOCK_POSTS: FoodPost[] = [
     lat: 40.7300,
     lng: -73.9950,
   },
+  {
+    id: 'post_4',
+    restaurantId: 'rest_2',
+    restaurantName: 'Green Cafe',
+    portions: 50,
+    predictedWasteKg: 10.2,
+    status: 'active',
+    createdAt: new Date(Date.now() - 1800000).toISOString(), // 30 mins ago
+    pickupBy: new Date(Date.now() + 14400000).toISOString(), // in 4 hours
+    address: '88 Coffee Road, Townsville',
+    lat: 40.7150,
+    lng: -74.0020,
+  },
 ];
+
+export const MOCK_SHELTER_USER: User = {
+  id: 'shelter_1',
+  email: 'shelter@foodbridge.com',
+  name: 'Hope Community Shelter',
+  type: 'shelter',
+  points: 250,
+  phone: '555-0211',
+  address: '789 Care Blvd, City Center',
+  lat: 40.7100,
+  lng: -74.0090,
+  capacity: 200,
+  licenseNumber: 'SHELTER-123-2026',
+  verified: true,
+  peopleServed: 450,
+  notificationsEnabled: true,
+  createdAt: new Date(Date.now() - 25 * 24 * 3600000).toISOString(),
+};
 
 export const MOCK_LEADERBOARD: LeaderboardEntry[] = [
   // Restaurants (with totalKgSaved)
@@ -113,6 +144,31 @@ export const MOCK_LEADERBOARD: LeaderboardEntry[] = [
     userType: 'restaurant',
     completedPickups: 3,
     totalKgSaved: 5.2,
+  },
+  // Shelters (with peopleServed)
+  {
+    id: 'shelter_1',
+    name: 'Hope Community Shelter',
+    points: 250,
+    userType: 'shelter',
+    completedPickups: 15,
+    peopleServed: 450,
+  },
+  {
+    id: 'shelter_2',
+    name: 'Safe Haven Refuge',
+    points: 180,
+    userType: 'shelter',
+    completedPickups: 10,
+    peopleServed: 320,
+  },
+  {
+    id: 'shelter_3',
+    name: 'Grace Soup Kitchen',
+    points: 120,
+    userType: 'shelter',
+    completedPickups: 7,
+    peopleServed: 210,
   },
   // Individuals (with badges)
   {

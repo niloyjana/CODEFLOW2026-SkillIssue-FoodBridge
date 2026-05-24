@@ -41,8 +41,8 @@ router.post('/register', requireAuth, async (req: AuthenticatedRequest, res: Res
       return;
     }
 
-    if (type !== 'restaurant' && type !== 'individual') {
-      res.status(400).json({ error: 'Invalid user type. Must be restaurant or individual' });
+    if (type !== 'restaurant' && type !== 'individual' && type !== 'shelter') {
+      res.status(400).json({ error: 'Invalid user type. Must be restaurant, individual, or shelter' });
       return;
     }
 
@@ -63,7 +63,7 @@ router.post('/register', requireAuth, async (req: AuthenticatedRequest, res: Res
     }
 
     // Create user record in Firestore
-    const userDoc = {
+    const userDoc: any = {
       id: uid,
       email,
       name,
@@ -72,8 +72,20 @@ router.post('/register', requireAuth, async (req: AuthenticatedRequest, res: Res
       completedPickups: 0,
       totalKgSaved: 0,
       badges: [],
+      address: req.body.address || '',
+      lat: Number(req.body.lat) || 40.7128,
+      lng: Number(req.body.lng) || -74.0060,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     };
+
+    if (type === 'shelter') {
+      userDoc.capacity = Number(req.body.capacity) || 0;
+      userDoc.licenseNumber = req.body.licenseNumber || '';
+      userDoc.verified = true; // Auto-verify for college hackathon prototype
+      userDoc.peopleServed = 0;
+    } else if (type === 'individual') {
+      userDoc.phone = req.body.phone || '';
+    }
 
     await userDocRef.set(userDoc);
 

@@ -18,7 +18,9 @@ export const Login: React.FC = () => {
     setLoading(true);
     try {
       await login(email, role);
-      navigate('/#about-us');
+      if (role === 'restaurant') navigate('/restaurant');
+      else if (role === 'shelter') navigate('/shelter');
+      else navigate('/individual');
     } catch (err) {
       console.error(err);
       alert('Login failed');
@@ -32,7 +34,9 @@ export const Login: React.FC = () => {
     setLoading(true);
     try {
       await login(emailAddr, selectedRole);
-      navigate('/#about-us');
+      if (selectedRole === 'restaurant') navigate('/restaurant');
+      else if (selectedRole === 'shelter') navigate('/shelter');
+      else navigate('/individual');
     } catch (err) {
       console.error(err);
       alert('Quick login failed');
@@ -59,13 +63,13 @@ export const Login: React.FC = () => {
         { onSubmit: handleSubmit },
         React.createElement(
           'div',
-          { className: 'auth-toggle-role' },
+          { className: 'auth-toggle-role', style: { display: 'flex', gap: '0.35rem', marginBottom: '1.25rem', background: 'rgba(0,0,0,0.03)', padding: '0.25rem', borderRadius: 'var(--radius-sm)' } },
           React.createElement(
             'button',
             {
               type: 'button',
               className: `role-tab ${role === 'restaurant' ? 'active' : ''}`,
-              style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' },
+              style: { flex: 1, padding: '0.5rem 0.25rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', border: '0', background: 'transparent', cursor: 'pointer' },
               onClick: () => setRole('restaurant')
             },
             React.createElement(Icons.Utensils, { size: 14 }),
@@ -75,8 +79,19 @@ export const Login: React.FC = () => {
             'button',
             {
               type: 'button',
+              className: `role-tab ${role === 'shelter' ? 'active' : ''}`,
+              style: { flex: 1, padding: '0.5rem 0.25rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', border: '0', background: 'transparent', cursor: 'pointer' },
+              onClick: () => setRole('shelter')
+            },
+            React.createElement(Icons.Award, { size: 14, color: 'var(--secondary-color)' }),
+            'Shelter'
+          ),
+          React.createElement(
+            'button',
+            {
+              type: 'button',
               className: `role-tab ${role === 'individual' ? 'active' : ''}`,
-              style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' },
+              style: { flex: 1, padding: '0.5rem 0.25rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', border: '0', background: 'transparent', cursor: 'pointer' },
               onClick: () => setRole('individual')
             },
             React.createElement(Icons.Heart, { size: 14 }),
@@ -91,7 +106,7 @@ export const Login: React.FC = () => {
             id: 'email',
             type: 'email',
             className: 'form-control glow-focus',
-            placeholder: role === 'restaurant' ? 'restaurant@foodbridge.com' : 'individual@foodbridge.com',
+            placeholder: role === 'restaurant' ? 'restaurant@foodbridge.com' : role === 'shelter' ? 'shelter@foodbridge.com' : 'individual@foodbridge.com',
             value: email,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
             required: true,
@@ -127,6 +142,18 @@ export const Login: React.FC = () => {
             },
             React.createElement(Icons.Utensils, { size: 11 }),
             'As Restaurant'
+          ),
+          React.createElement(
+            Button,
+            {
+              type: 'button',
+              variant: 'secondary',
+              className: 'role-tab',
+              style: { flex: 1, padding: '0.4rem', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' },
+              onClick: () => handleQuickLogin('shelter', 'shelter@foodbridge.com')
+            },
+            React.createElement(Icons.Award, { size: 11, color: 'var(--secondary-color)' }),
+            'As Shelter'
           ),
           React.createElement(
             Button,

@@ -690,4 +690,87 @@ h1, h2, h3, h4, h5, h6 {
 .delay-3 { animation-delay: 0.3s; }
 .delay-4 { animation-delay: 0.4s; }
 
+/* ─── Map Stack Styles ────────────────────────────────────────────────────── */
+
+.map-container {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  position: relative;
+}
+
+.map-section {
+  margin-bottom: 1.5rem;
+}
+
+/* MapLibre overrides */
+.maplibregl-popup-content {
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+  padding: 8px 12px !important;
+  font-family: var(--font-body) !important;
+}
+
+.maplibregl-popup-close-button {
+  font-size: 16px !important;
+  padding: 4px 8px !important;
+  color: var(--text-secondary) !important;
+}
+
+.maplibregl-ctrl-group {
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Search bar spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Directions panel slide-up */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.directions-panel {
+  animation: slideUp 0.3s ease forwards;
+}
+
+/* Map marker hover effect */
+.map-marker-pin:hover {
+  transform: rotate(-45deg) scale(1.15) !important;
+  z-index: 10 !important;
+}
+
+/* Route planner stop connector line */
+.route-stop-connector {
+  width: 2px;
+  height: 16px;
+  background: linear-gradient(to bottom, #1976d2, rgba(25,118,210,0.3));
+  margin-left: 11px;
+}
+
+/* Responsive map adjustments */
+@media (max-width: 768px) {
+  .map-container {
+    border-radius: var(--radius-sm);
+  }
+
+  .search-bar-container {
+    margin-bottom: 0.5rem;
+  }
+
+  .maplibregl-ctrl-top-right {
+    top: 8px !important;
+    right: 8px !important;
+  }
+}
 

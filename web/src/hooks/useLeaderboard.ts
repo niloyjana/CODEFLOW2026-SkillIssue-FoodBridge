@@ -29,14 +29,20 @@ export const useLeaderboard = () => {
     .sort((a, b) => b.points - a.points);
 
   const shelterLeaderboard = entries
+    .filter((entry) => entry.userType === 'shelter')
+    .sort((a, b) => b.points - a.points);
+
+  const individualLeaderboard = entries
     .filter((entry) => entry.userType === 'individual')
     .sort((a, b) => b.points - a.points);
 
   return {
     restaurantLeaderboard,
     shelterLeaderboard,
+    individualLeaderboard,
     loading,
     error,
     refresh: fetchLeaderboard,
   };
 };
+export default useLeaderboard;

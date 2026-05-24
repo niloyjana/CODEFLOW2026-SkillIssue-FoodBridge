@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import authRouter from './routes/auth';
 import postsRouter from './routes/posts';
 import leaderboardRouter from './routes/leaderboard';
+import claimsRouter from './routes/claims';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/posts', postsRouter);
 app.use('/api/leaderboard', leaderboardRouter);
+app.use('/api/claims', claimsRouter);
 
 // Health check
 app.get('/health', (req, res) => {

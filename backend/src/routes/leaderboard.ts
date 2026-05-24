@@ -20,10 +20,15 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response) =>
       completedPickups: doc.data().completedPickups || 0,
       totalKgSaved: doc.data().totalKgSaved || 0,
       badges: doc.data().badges || [],
+      peopleServed: doc.data().peopleServed || 0,
     }));
 
     if (type) {
-      const filterType = type === 'restaurants' ? 'restaurant' : 'individual';
+      let filterType = 'individual';
+      if (type === 'restaurants') filterType = 'restaurant';
+      else if (type === 'shelters') filterType = 'shelter';
+      else if (type === 'individuals') filterType = 'individual';
+      
       entries = entries.filter(e => e.userType === filterType);
     }
 

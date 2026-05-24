@@ -6,5 +6,7 @@ export const ENDPOINTS = {
   predict: `${AI_BASE_URL}/predict`,
   leaderboard: `${API_BASE_URL}/api/leaderboard`,
   claim: `${API_BASE_URL}/api/posts/claim`,
+  claimIndividual: `${API_BASE_URL}/api/claims/individual`,
+  claimBulk: `${API_BASE_URL}/api/claims/bulk`,
   auth: `${API_BASE_URL}/api/auth`,
 } as const;

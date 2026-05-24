@@ -1,51 +1,14 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './hooks/useAuth';
 import Layout from './components/common/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import RestaurantPage from './pages/RestaurantPage';
 import IndividualPage from './pages/IndividualPage';
+import ShelterPage from './pages/ShelterPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import LandingPage from './pages/LandingPage';
-
-// Guard for authenticated users
-const ProtectedRoute: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return React.createElement('div', { className: 'text-center', style: { padding: '5rem' } }, 'Loading session...');
-  }
-
-  if (!user) {
-    return React.createElement(Navigate, { to: '/login', replace: true });
-  }
-
-  return React.createElement(React.Fragment, null, children);
-};
-
-// Guard for role specific routes
-const RoleRoute: React.FC<{ children?: React.ReactNode; allowedRole: 'restaurant' | 'individual' }> = ({
-  children,
-  allowedRole,
-}) => {
-  const { user } = useAuth();
-
-  if (!user) {
-    return React.createElement(Navigate, { to: '/login', replace: true });
-  }
-
-  if (user.type !== allowedRole) {
-    return React.createElement(Navigate, {
-      to: user.type === 'restaurant' ? '/restaurant' : '/individual',
-      replace: true,
-    });
-  }
-
-  return React.createElement(React.Fragment, null, children);
-};
-
-
+import RoleRoute from './components/common/RoleRoute';
 
 export const AppRoutes: React.FC = () => {
   return React.createElement(
@@ -79,13 +42,20 @@ export const AppRoutes: React.FC = () => {
       {
         path: '/restaurant',
         element: React.createElement(
-          ProtectedRoute,
-          null,
-          React.createElement(
-            RoleRoute,
-            { allowedRole: 'restaurant' },
-            React.createElement(Layout, null, React.createElement(RestaurantPage, null))
-          )
+          RoleRoute,
+          { allowedTypes: ['restaurant'] },
+          React.createElement(Layout, null, React.createElement(RestaurantPage, null))
+        )
+      }
+    ),
+    React.createElement(
+      Route,
+      {
+        path: '/shelter',
+        element: React.createElement(
+          RoleRoute,
+          { allowedTypes: ['shelter'] },
+          React.createElement(Layout, null, React.createElement(ShelterPage, null))
         )
       }
     ),
@@ -94,13 +64,9 @@ export const AppRoutes: React.FC = () => {
       {
         path: '/individual',
         element: React.createElement(
-          ProtectedRoute,
-          null,
-          React.createElement(
-            RoleRoute,
-            { allowedRole: 'individual' },
-            React.createElement(Layout, null, React.createElement(IndividualPage, null))
-          )
+          RoleRoute,
+          { allowedTypes: ['individual'] },
+          React.createElement(Layout, null, React.createElement(IndividualPage, null))
         )
       }
     ),
@@ -122,4 +88,5 @@ export const AppRoutes: React.FC = () => {
     )
   );
 };
+
 export default AppRoutes;

@@ -233,4 +233,54 @@ router.post('/claim', requireAuth, async (req: AuthenticatedRequest, res: Respon
   }
 });
 
+// POST /api/posts/:postId/complete
+router.post('/:postId/complete', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { postId } = req.params;
+    const { userId } = req.body;
+    const firebaseUser = req.user;
+
+    if (!userId) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    if (userId !== firebaseUser.uid) {
+      res.status(403).json({ error: 'Forbidden: Action user does not match token UID' });
+      return;
+    }
+
+    const postRef = db.collection('posts').doc(postId);
+    const postSnapshot = await postRef.get();
+
+    if (!postSnapshot.exists) {
+      res.status(404).json({ error: 'Post not found' });
+      return;
+    }
+
+    const postData = postSnapshot.data();
+
+    if (postData?.claimedBy !== userId) {
+      res.status(403).json({ error: 'Forbidden: Only the claiming user can mark this post as completed' });
+      return;
+    }
+
+    if (postData?.status !== 'claimed') {
+      res.status(400).json({ error: 'Post is not in claimed status' });
+      return;
+    }
+
+    await postRef.update({ status: 'completed' });
+
+    res.status(200).json(serializeData({
+      ...postData,
+      id: postId,
+      status: 'completed'
+    }));
+  } catch (err: any) {
+    console.error('Error in POST /posts/:postId/complete:', err.message || err);
+    res.status(500).json({ error: err.message || 'Failed to complete post' });
+  }
+});
+
 export default router;

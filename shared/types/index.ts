@@ -1,13 +1,14 @@
-export type UserType = 'restaurant' | 'individual';
+export type UserType = 'restaurant' | 'shelter' | 'individual';
 
 export interface LeaderboardEntry {
   id: string;
   name: string;
   points: number;
-  userType: 'restaurant' | 'individual';
+  userType: 'restaurant' | 'shelter' | 'individual';
   completedPickups: number;
   totalKgSaved?: number;      // restaurants only
   badges?: string[];           // individuals only
+  peopleServed?: number;       // shelters only
 }
 
 export interface FoodPost {
@@ -19,7 +20,7 @@ export interface FoodPost {
   status: 'active' | 'claimed' | 'completed';
   createdAt: string;
   pickupBy: string;
-  claimedBy?: string;          // individual user ID
+  claimedBy?: string;          // user ID (individual or shelter)
   claimedByName?: string;
   lat?: number;                // for map view
   lng?: number;
@@ -38,6 +39,10 @@ export interface User {
   lng?: number;
   notificationsEnabled?: boolean;
   createdAt: string;
+  capacity?: number;           // shelters only
+  licenseNumber?: string;      // shelters only
+  verified?: boolean;          // shelters only
+  peopleServed?: number;       // shelters only
 }
 
 export interface Claim {
