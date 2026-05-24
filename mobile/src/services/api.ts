@@ -10,8 +10,8 @@ import {
 
 import { Platform } from 'react-native';
 
-// Your computer's LAN IP (both phone and computer must be on the same WiFi)
-const LAN_IP = '10.47.145.241';
+// Your computer's LAN IP (both phone and computer must be on the same Wi-Fi)
+const LAN_IP = '192.168.0.102';
 
 // Web preview uses localhost, physical devices use LAN IP
 const API_BASE_URL = Platform.OS === 'web'
