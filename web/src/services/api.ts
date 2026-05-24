@@ -2,12 +2,12 @@ import axios from 'axios';
 import { FoodPost, LeaderboardEntry, User, UserType, AppNotification } from 'shared/types';
 import { ENDPOINTS, AI_BASE_URL } from 'shared/constants/endpoints';
 import { auth as firebaseAuth } from '../config/firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 import { MOCK_POSTS, MOCK_LEADERBOARD } from './mockData';
 
 // Toggle for switching between mock simulation and actual API calls
-export const MOCK_MODE = true;
+export const MOCK_MODE = false;
 
 let mockPostsInMemory = [...MOCK_POSTS];
 let mockLeaderboardInMemory = [...MOCK_LEADERBOARD];
@@ -28,11 +28,11 @@ const getAuthHeaders = async () => {
 
 export const apiService = {
   // Authentication
-  login: async (email: string, type: UserType): Promise<User> => {
-    const password = `${email.split('@')[0]}FB123!`;
+  login: async (email: string, type: UserType, password?: string): Promise<User> => {
+    const finalPassword = password || `${email.split('@')[0]}FoodBridge123!`;
 
     if (!MOCK_MODE) {
-      const credential = await signInWithEmailAndPassword(firebaseAuth, email, password);
+      const credential = await signInWithEmailAndPassword(firebaseAuth, email, finalPassword);
       const idToken = await credential.user.getIdToken();
 
       const response = await axios.post(
@@ -60,12 +60,48 @@ export const apiService = {
     return user;
   },
 
-  register: async (name: string, email: string, type: UserType, extraFields?: any): Promise<User> => {
-    const password = `${email.split('@')[0]}FB123!`;
+  loginWithGoogle: async (type: UserType): Promise<User> => {
+    if (MOCK_MODE) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const user: User = {
+        id: `mock_google_user`,
+        name: 'Google User',
+        email: 'googleuser@foodbridge.com',
+        type,
+        points: 0,
+        createdAt: new Date().toISOString(),
+      };
+      localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(user));
+      return user;
+    }
+
+    const provider = new GoogleAuthProvider();
+    const credential = await signInWithPopup(firebaseAuth, provider);
+    const email = credential.user.email!;
+    const idToken = await credential.user.getIdToken();
+
+    const response = await axios.post(
+      `${ENDPOINTS.auth}/login`,
+      { email, type },
+      { headers: { Authorization: `Bearer ${idToken}` } }
+    );
+    
+    const user = response.data;
+    localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(user));
+    return user;
+  },
+
+  register: async (name: string, email: string, type: UserType, extraFields?: any, password?: string): Promise<User> => {
+    const finalPassword = password || `${email.split('@')[0]}FoodBridge123!`;
 
     if (!MOCK_MODE) {
-      const credential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
-      const idToken = await credential.user.getIdToken();
+      let idToken: string;
+      if (firebaseAuth.currentUser && firebaseAuth.currentUser.email?.toLowerCase() === email.toLowerCase()) {
+        idToken = await firebaseAuth.currentUser.getIdToken();
+      } else {
+        const credential = await createUserWithEmailAndPassword(firebaseAuth, email, finalPassword);
+        idToken = await credential.user.getIdToken();
+      }
 
       const response = await axios.post(
         `${ENDPOINTS.auth}/register`,

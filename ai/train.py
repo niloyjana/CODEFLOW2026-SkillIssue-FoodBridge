@@ -74,8 +74,11 @@ def train_model():
     model.fit(X, y)
     
     # Save the model
-    joblib.dump(model, 'waste_model.pkl')
-    print("Model saved to waste_model.pkl")
+    import os
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(base_dir, 'waste_model.pkl')
+    joblib.dump(model, model_path)
+    print(f"Model saved to {model_path}")
 
 if __name__ == '__main__':
     train_model()

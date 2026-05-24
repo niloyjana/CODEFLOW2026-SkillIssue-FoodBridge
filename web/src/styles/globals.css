@@ -143,7 +143,6 @@ h6 {
   color: var(--text-secondary);
   font-weight: 500;
   font-size: 0.8rem;
-  font-style: italic;
   font-family: var(--font-heading);
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
@@ -173,7 +172,6 @@ h6 {
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  font-style: italic;
   font-family: var(--font-heading);
 }
 
@@ -184,7 +182,6 @@ h6 {
   background: var(--secondary-light);
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius-full);
-  font-style: italic;
   font-family: var(--font-heading);
 }
 

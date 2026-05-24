@@ -209,32 +209,19 @@ export const Navbar: React.FC = () => {
           { 
             onClick: () => { handleLogout(); setMobileMenuOpen(false); }, 
             className: 'btn btn-secondary', 
-            style: { padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontStyle: 'italic', fontFamily: 'var(--font-heading)' } 
+            style: { padding: '0.4rem 0.8rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontFamily: 'var(--font-heading)' } 
           },
           React.createElement(Icons.LogOut, { size: 14 }),
           'Logout'
         )
       ) : React.createElement(
-        React.Fragment,
-        null,
-        React.createElement(
-          NavLink,
-          {
-            to: '/login',
-            className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`,
-            onClick: () => setMobileMenuOpen(false)
-          },
-          'Login'
-        ),
-        React.createElement(
-          NavLink,
-          {
-            to: '/register',
-            className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`,
-            onClick: () => setMobileMenuOpen(false)
-          },
-          'Register'
-        )
+        NavLink,
+        {
+          to: '/login',
+          className: ({ isActive }) => `nav-link ${isActive ? 'active' : ''}`,
+          onClick: () => setMobileMenuOpen(false)
+        },
+        'Sign in'
       )
     )
   );

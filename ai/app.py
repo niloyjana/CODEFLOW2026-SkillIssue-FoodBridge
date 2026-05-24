@@ -23,13 +23,15 @@ class PrefixMiddleware(object):
 
 app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/api/ai')
 
-MODEL_PATH = 'waste_model.pkl'
-UPLOAD_FOLDER = 'uploads'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, 'waste_model.pkl')
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+MODELS_DIR = os.path.join(BASE_DIR, 'models')
 ALLOWED_EXTENSIONS = {'csv'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs('models', exist_ok=True)
+os.makedirs(MODELS_DIR, exist_ok=True)
 
 # Load model globally if it exists
 model = None
@@ -129,7 +131,7 @@ def train_model_endpoint():
             'training_rows': len(df)
         }
         
-        model_out_path = f'models/{restaurant_id}_model.pkl'
+        model_out_path = os.path.join(MODELS_DIR, f'{restaurant_id}_model.pkl')
         joblib.dump(model_data, model_out_path)
         
         # Calculate actual training accuracy based on MAPE (Mean Absolute Percentage Error)
@@ -178,7 +180,7 @@ def predict_waste():
         is_weekend = 1 if today >= 5 else 0
         
         # Check if restaurant has a customized model
-        custom_model_path = f'models/{restaurant_id}_model.pkl' if restaurant_id else None
+        custom_model_path = os.path.join(MODELS_DIR, f'{restaurant_id}_model.pkl') if restaurant_id else None
         
         if custom_model_path and os.path.exists(custom_model_path):
             print(f"Using customized model for restaurant {restaurant_id}")
@@ -259,8 +261,8 @@ def health_check():
     return jsonify({
         'status': 'ok',
         'global_model_loaded': model is not None,
-        'uploads_count': len(glob.glob('uploads/*.csv')),
-        'custom_models_count': len(glob.glob('models/*.pkl'))
+        'uploads_count': len(glob.glob(os.path.join(UPLOAD_FOLDER, '*.csv'))),
+        'custom_models_count': len(glob.glob(os.path.join(MODELS_DIR, '*.pkl')))
     })
 
 if __name__ == '__main__':

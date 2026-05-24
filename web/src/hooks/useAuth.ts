@@ -7,8 +7,9 @@ import { auth } from '../config/firebase';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, type: UserType) => Promise<void>;
-  register: (name: string, email: string, type: UserType, extraFields?: any) => Promise<void>;
+  login: (email: string, type: UserType, password?: string) => Promise<void>;
+  loginWithGoogle: (type: UserType) => Promise<void>;
+  register: (name: string, email: string, type: UserType, extraFields?: any, password?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => void;
 }
@@ -35,20 +36,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
-  const login = async (email: string, type: UserType) => {
+  const login = async (email: string, type: UserType, password?: string) => {
     setLoading(true);
     try {
-      const loggedUser = await apiService.login(email, type);
+      const loggedUser = await apiService.login(email, type, password);
       setUser(loggedUser);
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (name: string, email: string, type: UserType, extraFields?: any) => {
+  const loginWithGoogle = async (type: UserType) => {
     setLoading(true);
     try {
-      const registeredUser = await apiService.register(name, email, type, extraFields);
+      const loggedUser = await apiService.loginWithGoogle(type);
+      setUser(loggedUser);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (name: string, email: string, type: UserType, extraFields?: any, password?: string) => {
+    setLoading(true);
+    try {
+      const registeredUser = await apiService.register(name, email, type, extraFields, password);
       setUser(registeredUser);
     } finally {
       setLoading(false);
@@ -72,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return React.createElement(
     AuthContext.Provider,
-    { value: { user, loading, login, register, logout, refreshSession } },
+    { value: { user, loading, login, loginWithGoogle, register, logout, refreshSession } },
     children
   );
 };
